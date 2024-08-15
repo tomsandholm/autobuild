@@ -1,0 +1,81 @@
+## template: jinja
+#cloud-config
+disable_root: 0
+ssh_pwauth: 1
+
+write_files:
+  - path: /etc/tom
+    content: |
+      This is data from the installation.
+      This is another line.
+    owner: root:root
+    permissions: '0644'
+  - path: /root/gitlab-setup
+    content: |
+      #! /bin/bash
+      export GITLAB_ROOT_EMAIL="root@local"
+      export GITLAB_ROOT_PASSWORD="theresa1"
+      export EXTERNAL_URL="http://gitlab.tsand.org"
+      apt-get install -y gitlab-ee
+    owner: root:root
+    permissions: '0644'
+  - path: /root/haproxy.cfg
+    content: |
+      defaults
+        log global
+        maxconn 2000
+        mode http
+        option redispatch
+        option forwardfor
+        option http-server-close
+        retries 3
+        timeout http-request 10s
+        timeout queue 1m
+        timeout connect 10s
+        timeout client 1m
+        timeout server 1m
+        timeout check 10s
+
+      frontend ft_jenkins
+        bind *:80
+        default_backend bk_jenkins
+        reqadd X-Forwarded-Proto:\ http
+
+      backend bk_jenkins
+        server jenkins1 10.0.0.10:8080 check
+        server jenkins2 10.0.0.11:8080 check
+
+
+#MOUNTS
+
+#PACKAGES
+
+#BOOTCMD
+
+#APT
+
+ntp:
+  enabled: true
+  ntp_client: ntp
+
+chpasswd:
+  list: |
+    root:$1$xyz$quBhc72d/1S/7c2IIRk7k1
+  expire: False
+
+manage_etc_hosts: True
+
+package_upgrade: true
+
+#ssh_pwauth: True
+
+users:
+  - name: ubuntu
+    ssh-authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQ/FTCuZVu475POTFx8zNre7TkmlQwGuru/omD0HihiGG+CUsXWlYPepUF2Ihf2tXfnbUaO8qLdz0EkvJ4AHQE/i+LfikXZcqXahBErjUnc+/5TNOWDi6YGabeTZ55bu4QjuyTbMFhpaW2KDD13rYcM6I41+vo6k8C5RnR6VXjgaY7aD4M2BjqCfjalJvCha+6trxsF7sqaljWNIHmRxEXlcTN0034OCqLL4GdKPeCw4Q/lH6J9W75M+a9r/Bdbhlak+ShKs3ArrmisT0qEwCpZ+UcYvmF00CtSRCHEoeVSsTfkGJRGU03rOE+QhWcJVWq5VfoJMfnwBbrTTQiRuCm5+7xpKSC9n0DjM4p1FkG1QzpQK5FRZ0GGzUVjpxVq/1Tb3XHrTImWJFykEXJ0wOXl/7KqgtQsW5AtDcWjiJt1/yn8yDdFutCWWXGEQcWpy4Dg/B5vqmcoq52HGJZTBIeKR0mBMKPC7okMq3YA6Gcy6u+oqYXi+o8zjQYukdzRUc= sandholm@beast4
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
+
+#RUNCMD
+
+
