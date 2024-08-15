@@ -327,7 +327,6 @@ node:	role disks network-config
 		--ram $(RAM) \
 		--vcpus=$(VCPUS) \
 		--disk path=$(IMGDIR)/$(SNAME)/rootfs.qcow2,device=disk,bus=virtio \
-		--os-type=linux \
 		--os-variant=ubuntu22.04 \
 		$(SWAPDISK) \
 		$(DATADISK) \
