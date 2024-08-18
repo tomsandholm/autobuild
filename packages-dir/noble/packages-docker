@@ -12,7 +12,7 @@ packages:
   - xinetd
   - zip
   - net-tools
-  - openjdk-11-jdk
+  - openjdk-17-jdk
   - build-essential
   - qemu
   - binfmt-support

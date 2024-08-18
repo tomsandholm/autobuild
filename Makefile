@@ -90,11 +90,11 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 35
+ROOTSIZE := 32
 
 ## docroot disk size
 ## in GB
-WEBSIZE := 0
+WEBSIZE := 32
 
 ## guest node ram size
 RAM := 4096
@@ -330,9 +330,10 @@ node:	role disks network-config
 		--os-variant=ubuntu22.04 \
 		$(SWAPDISK) \
 		$(DATADISK) \
+		$(WEBDISK) \
 		--graphics $(GRAPHICS) \
 		--import \
 		--wait=-1 \
-		--cloud-init meta-data=meta-data.yaml,user-data=user-data.yaml,network-config=$(IMGDIR)/$(SNAME)/network-config
+		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 	#sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
 	virsh start $(SNAME)
