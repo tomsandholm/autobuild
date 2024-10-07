@@ -100,7 +100,7 @@ WEBSIZE := 32
 RAM := 4096
 
 ## guest node cpu coount
-VCPUS := 6
+VCPUS := 4
 
 ## guest node os type
 OS-VARIANT := ubuntu20.04
