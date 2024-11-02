@@ -17,3 +17,4 @@ packages:
   - qemu
   - binfmt-support
   - qemu-user-static
+  - gh
