@@ -1,0 +1,15 @@
+bootcmd:
+ - mkswap /dev/vdb
+ - swapon /dev/vdb
+ - pvcreate /dev/vdc
+ - vgcreate vgdocker /dev/vdc
+ - lvcreate --name lvdocker -l 100%FREE vgdocker
+ - mke2fs -j /dev/vgdocker/lvdocker
+ - pvcreate /dev/vdd
+ - vgcreate vgjenkins /dev/vdd
+ - lvcreate --name lvjenkins -l 100%FREE vgjenkins
+ - mke2fs -j /dev/vgjenkins/lvjenkins
+ - apt-get install -y gh
+ - apt-get update
+ - cd /root && git clone https://github.com/tomsandholm/agent-tools.git
+
