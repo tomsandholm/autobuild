@@ -12,7 +12,9 @@ runcmd:
   - service docker restart
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
-  - cd /home/sandholm && gh repo clone https://github.com/LibreBooking/docker.git
+  - docker pull jgiannuzzi/gitolite
+  - docker volume create --name gitolite-sshkeys
+  - docker volume create --name gitolite-git
   - cd /home/sandholm && chown -R sandholm:sandholm .
   - eject
   - shutdown -h now
