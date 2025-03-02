@@ -43,6 +43,7 @@ DOMAIN := .tsand.org
 #DISTRO := focal
 #DISTRO := jammy
 DISTRO := noble
+#DISTRO := noblemin
 #DISTRO := bionicmin
 #DISTRO := focalmin
 #DISTRO := jammymin
@@ -194,7 +195,7 @@ $(BASEDIR)/$(DISTRO):	$(BASEDIR)/$(DISTRO)/rootfs.qcow2
 
 $(BASEDIR)/$(DISTRO)/rootfs.qcow2:
 	mkdir -p $(BASEDIR)/$(DISTRO)
-	cp -v $(SRCDIR)/$(DISTRO)/$(SRC) $(BASEDIR)/$(DISTRO)/rootfs.qcow2
+	cp -rv $(SRCDIR)/$(DISTRO)/$(SRC) $(BASEDIR)/$(DISTRO)/rootfs.qcow2
 
 ## create a node image
 image:	base $(IMGDIR)/$(SNAME)
@@ -313,7 +314,7 @@ Delete:
 	virsh undefine $(SNAME) --remove-all-storage
 	rm -rf $(IMGDIR)/$(SNAME)
 	rm -rf $(DATADIR)/$(SNAME)
-	#sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
+	sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
 	make -e NAME=$(NAME) clean-image
 
 
@@ -335,5 +336,5 @@ node:	role disks network-config
 		--import \
 		--wait=-1 \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
-	#sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
+	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
 	virsh start $(SNAME)

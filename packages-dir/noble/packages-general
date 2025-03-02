@@ -7,3 +7,4 @@ packages:
   - xinetd
   - zip
   - net-tools
+  - ansible

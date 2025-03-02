@@ -12,5 +12,7 @@ runcmd:
   - service docker restart
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
+  - cd /home/sandholm && gh repo clone https://github.com/LibreBooking/docker.git
+  - cd /home/sandholm && chown -R sandholm:sandholm .
   - eject
   - shutdown -h now
