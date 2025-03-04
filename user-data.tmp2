@@ -16,19 +16,10 @@ write_files:
 #MOUNTS
 mounts:
   - ["/dev/vdb", "none", "swap", "sw", "0", "0"]
-  - ["/dev/vgdocker/lvdocker", "/var/lib/docker", auto, "defaults"]
-  - ["/dev/vgjenkins/lvjenkins", "/var/lib/jenkins", auto, "defaults"]
-
-
 
 #PACKAGES
-# packages-docker
+# packages-general
 packages:
-  - apt-transport-https
-  - ca-certificates
-  - curl 
-  - software-properties-common
-  - lsb-release
   - python3
   - lsof
   - netcat
@@ -36,28 +27,12 @@ packages:
   - xinetd
   - zip
   - net-tools
-  - openjdk-17-jdk
-  - build-essential
-  - qemu
-  - binfmt-support
-  - qemu-user-static
+  - ansible
 
 #BOOTCMD
 bootcmd:
  - mkswap /dev/vdb
  - swapon /dev/vdb
- - pvcreate /dev/vdc
- - vgcreate vgdocker /dev/vdc
- - lvcreate --name lvdocker -l 100%FREE vgdocker
- - mke2fs -j /dev/vgdocker/lvdocker
- - pvcreate /dev/vdd
- - vgcreate vgjenkins /dev/vdd
- - lvcreate --name lvjenkins -l 100%FREE vgjenkins
- - mke2fs -j /dev/vgjenkins/lvjenkins
- - apt-get install -y gh
- - apt-get update
- - cd /root && git clone https://github.com/tomsandholm/agent-tools.git
-
 
 #APT
 
@@ -88,6 +63,11 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKqXZ+SLI5aH0aYMfoIygApu28cmVH06GU91Ko6hpfBblNntam4Mi6tWolCeZLeaDmZ+/LdXWykbmOyoKq42S2SStjimkeUTqQWHt6wojPfIZwovk7zN5Vn7V8w54e0/v97fX/j9gCvDToHzx6ReJyR5uRoMJ9Cs82DlJwOE6sVpbOPnpYwlCCB7zZmi82RiXZ7pVO6C3ezcJvl3565gxqHbmcqK5uDbXx2mTFC08TUxyxWOfEeAJbhM5RD7OtmbYTL59HlzuhPhgG8jCSUq5nJvOKqhqNvDF0MzVbV2hxmiJsfvQ84fxvCTh4CWOGxUMzEv57uLdTgQeXm1Gl01FNUIPvwPaRVYUzPXyFzPrXkN19f7fTJ6pCJpw/4O35RGIL57fK4jYV0y0xPrDtRESiwColvqubIi27NAqGJwAwJzNNe696COoj8ORsEMxn5uwB68xMALK6IIJZcTk4FO13JQqD/hlIb8+JkkmqToTFmymbjPiTTiIKA6soWOxeteM= sandholm@beast4
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
+  - name: ansible
+    ssh-authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWmZH8E1EWcUZK91tZhhM3J7+9AMJzs+uVa6I+1lYOUDwdlFxqK2xszVGpVVN3gjtCiN/MboNLW5oUq3aT9lEtyroVqYMVtmrq+4x9sXOQ5X0YmWqw6s3MDExbLFkUJsYt/WN5ZdgadyXoPHdIjLm9B5+qGmBxW2Xo/HEfPiTG+pyO3K3mEeRB7ntqzWkDf/cJWfVE1tMZzP5RQAFGEo7A3Y7BRmaZBrYLa9r0UB2z2UhlPotk7YauIgn6AtuN1C39DPgfokzmfuuP5a/FWIyv45nazbgszzyJZ/hBQFho0t2/0SucWUkFrTncptBV6OMTqDR47NN7CtxXjqdIKxYOiKHmOAqXXk1NnUEwGFVfAo7IGqURnoFs5fIbh4JlFJhMgeJkTvrSMCLAwir+J4MsKftZhdeXzqW5EEV+IuK86OZW3nWqXoI0fzu8KOz+JW91lmwXz6Mc8hW2YA50/JRCV63MizXyspPq3dxGSQURYDmrSDAUfY6hcpmIxa5FGQ8= ansible@beast4
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
 
 #RUNCMD
 runcmd:
@@ -95,13 +75,6 @@ runcmd:
   - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
   - update-grub
   - apt autoremove -y
-  - curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu noble stable"
-  - apt-get update -y
-  - apt-get install -y docker-ce docker-ce-cli containerd.io
-  - sed -i 's@^ExecStart=.*@ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock@g' /lib/systemd/system/docker.service
-  - systemctl daemon-reload
-  - service docker restart
   - touch /etc/cloud/cloud-init.disabled
   - eject
   - shutdown -h now
