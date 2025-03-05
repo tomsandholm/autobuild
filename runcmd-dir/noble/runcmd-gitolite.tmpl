@@ -5,6 +5,5 @@ runcmd:
   - apt autoremove -y
   - touch /etc/cloud/cloud-init.disabled
   - cd /home/sandholm && chown -R sandholm:sandholm .
-  - [su, git, -c, "git clone https://github.com/sitaramc/gitolite"]
   - eject
   - shutdown -h now
