@@ -1,0 +1,8 @@
+#! /usr/bin/bash
+# vi:set nu ai ap aw smd showmatch tabstop=4 shiftwidth=4:
+
+make -e NAME=ha1.tsand.org ROLE=gluster node
+make -e NAME=ha2.tsand.org ROLE=gluster node
+make -e NAME=ha3.tsand.org ROLE=gluster node
+#make -e NAME=ha4.tsand.org ROLE=gluster node
+
