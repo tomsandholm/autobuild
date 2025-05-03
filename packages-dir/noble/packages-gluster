@@ -7,5 +7,7 @@ packages:
   - xinetd
   - zip
   - net-tools
+  - ntpsec
   - glusterfs-server
   - glusterfs-client
+  - ansible

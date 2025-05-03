@@ -4,7 +4,6 @@ packages:
   - lsof
   - netcat
   - haveged
-  - xinetd
   - zip
   - net-tools
-  - ansible
+  - ntpsec

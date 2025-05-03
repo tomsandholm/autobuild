@@ -4,5 +4,5 @@
 make -e NAME=ha1.tsand.org ROLE=gluster node
 make -e NAME=ha2.tsand.org ROLE=gluster node
 make -e NAME=ha3.tsand.org ROLE=gluster node
-#make -e NAME=ha4.tsand.org ROLE=gluster node
+#make -e NAME=ha4.tsand.org ROLE=gluster Delete
 

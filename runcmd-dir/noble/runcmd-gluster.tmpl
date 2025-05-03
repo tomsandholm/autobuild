@@ -4,11 +4,15 @@ runcmd:
   - update-grub
   - apt autoremove -y
   - apt-get install software-properties-common
-  - add-apt-repository ppa:gluster/glusterfs-7
   - apt update
   - apt-get install glusterfs-server
   - mkdir /glusterstorage/dir00
   - systemctl enable glusterd.service
   - touch /etc/cloud/cloud-init.disabled
+  - sed -i '/^127.0.1.1/d' /etc/hosts
   - eject
+  - echo "10.0.0.121 ha1.tsand.org ha1" >> /etc/hosts
+  - echo "10.0.0.122 ha2.tsand.org ha2" >> /etc/hosts
+  - echo "10.0.0.123 ha3.tsand.org ha3" >> /etc/hosts
+  - echo "10.0.0.124 ha4.tsand.org ha4" >> /etc/hosts
   - shutdown -h now

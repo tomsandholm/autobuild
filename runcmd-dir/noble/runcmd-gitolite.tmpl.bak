@@ -6,7 +6,7 @@ runcmd:
   - touch /etc/cloud/cloud-init.disabled
   - cd /home/sandholm && chown -R sandholm:sandholm .
   - cd /home/git && chown -R git:git .
-  - sudo -u git /usr/bin/bash -c "export HOME=/home/git; git clone https://github.com/sitaramc/gitolite"
+  - sudo -u git /usr/bin/bash -c "export HOME=/home/git && git clone https://github.com/sitaramc/gitolite || git clone https://github.com/sitaramc/gitolite || git clone https://github.com/sitaramc/gitolite"
   - sudo -u git /usr/bin/bash -c "export HOME=/home/git && mkdir -p /home/git/bin"
   - sudo -u git /usr/bin/bash -c "export HOME=/home/git && gitolite/install -to /home/git/bin"
   - cp /home/sandholm/.ssh/authorized_keys /home/git/sandholm.pub

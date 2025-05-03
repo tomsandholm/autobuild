@@ -81,27 +81,27 @@ SWAPSIZE := 2
 
 ## datadisk size
 ## in GB
-DATASIZE := 16
+DATASIZE := 32
 
 ## DBLOGSIZE
-DBLOGSIZE := 0
+DBLOGSIZE := 32
 
 ## DBSIZE
-DBSIZE := 0
+DBSIZE := 32
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 16
+ROOTSIZE := 32
 
 ## docroot disk size
 ## in GB
-WEBSIZE := 0
+WEBSIZE := 32
 
 ## guest node ram size
-RAM := 2048
+RAM := 4096
 
 ## guest node cpu coount
-VCPUS := 1
+VCPUS := 4
 
 ## guest node os type
 OS-VARIANT := ubuntu20.04
