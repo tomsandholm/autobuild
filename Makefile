@@ -58,7 +58,7 @@ GRAPHICS := none
 SNAME = $(shell echo $(NAME) | cut -d'.' -f1)
 
 ## the URL of where to get THIS $DISTRO
-URL := $(shell egrep "^$(DISTRO)" ./distro | cut -d';' -f3)
+URL := $(shell egrep "^$(DISTRO);" ./distro | cut -d';' -f3)
 
 ## the IMG name of THIS $DISTRO
 SRC := $(shell egrep "^$(DISTRO)" ./distro | cut -d';' -f4)
