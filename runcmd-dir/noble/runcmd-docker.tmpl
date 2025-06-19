@@ -7,12 +7,10 @@ runcmd:
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu noble stable"
   - apt-get update -y
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
-  - sed -i 's@^ExecStart=.*@ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock@g' /lib/systemd/system/docker.service
+  - sed -i 's@^ExecStart=.*@ExecStart=/usr/bin/dockerd --tls=false -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock@g' /lib/systemd/system/docker.service
   - systemctl daemon-reload
   - service docker restart
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
-  - cd /home/sandholm && gh repo clone https://github.com/LibreBooking/docker.git
-  - cd /home/sandholm && chown -R sandholm:sandholm .
   - eject
   - shutdown -h now

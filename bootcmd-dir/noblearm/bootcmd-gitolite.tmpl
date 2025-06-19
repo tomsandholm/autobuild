@@ -1,0 +1,10 @@
+bootcmd:
+ - mkswap /dev/vdb
+ - swapon /dev/vdb
+ - pvcreate /dev/vdc
+ - vgcreate vggitolite /dev/vdc
+ - lvcreate --name lvgitolite -l 100%FREE vggitolite
+ - mke2fs -j /dev/vggitolite/lvgitolite
+ - apt-get install -y gh
+ - apt-get update
+

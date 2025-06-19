@@ -1,0 +1,7 @@
+organization = TomKat Systems
+cn = tom1.tsand.org
+tls_www_server
+encryption_key
+signing_key
+expiration_days = 3650
+

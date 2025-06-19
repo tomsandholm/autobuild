@@ -37,19 +37,21 @@ list:
 targets:
 	sed -n 's/^\([a-Z][a-Z-]*\):.*/\1/gp' Makefile
 
+ARCH := x86_64
+#ARCH := aarch64
+
 DOMAIN := .tsand.org
 ## the distro to build
 #DISTRO := xenial
 #DISTRO := focal
 #DISTRO := jammy
+#DISTRO := noble
 DISTRO := noble
 #DISTRO := noblemin
 #DISTRO := bionicmin
 #DISTRO := focalmin
 #DISTRO := jammymin
 #DISTRO := bionic
-
-ARCH=x86_64
 
 ## graphics
 GRAPHICS := none
@@ -77,34 +79,35 @@ ENV := dev
 
 ## swapdisk size
 ## in GB
-SWAPSIZE := 2
+SWAPSIZE := 4
 
 ## datadisk size
 ## in GB
-DATASIZE := 32
+#DATASIZE := 16
+DATASIZE := 0
 
 ## DBLOGSIZE
-DBLOGSIZE := 32
+DBLOGSIZE := 0
 
 ## DBSIZE
-DBSIZE := 32
+DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 32
+ROOTSIZE := 16
 
 ## docroot disk size
 ## in GB
-WEBSIZE := 32
+WEBSIZE := 0
 
 ## guest node ram size
 RAM := 4096
 
 ## guest node cpu coount
-VCPUS := 4
+VCPUS := 3
 
 ## guest node os type
-OS-VARIANT := ubuntu20.04
+OS-VARIANT := ubuntu22.04
 
 ## where the etc directoy lives
 ETCDIR := /etc/kvmbld
@@ -324,6 +327,7 @@ node:	role disks network-config
 
 	virt-install \
 		--connect=qemu:///system \
+		--arch $(ARCH) \
 		--name $(SNAME) \
 		--ram $(RAM) \
 		--vcpus=$(VCPUS) \
@@ -334,7 +338,6 @@ node:	role disks network-config
 		$(WEBDISK) \
 		--graphics $(GRAPHICS) \
 		--import \
-		--wait=-1 \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
 	virsh start $(SNAME)

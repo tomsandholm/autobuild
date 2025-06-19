@@ -1,0 +1,8 @@
+#! /usr/bin/bash
+# vi:set nu ai ap aw smd showmatch tabstop=4 shiftwidth=4:
+
+
+                                               
+ssh -o StrictHostKeyChecking=accept-new ha1.tsand.org sudo gluster peer probe 10.0.0.121
+ssh -o StrictHostKeyChecking=accept-new ha1.tsand.org sudo gluster peer probe 10.0.0.122
+ssh -o StrictHostKeyChecking=accept-new ha1.tsand.org sudo gluster peer probe 10.0.0.123

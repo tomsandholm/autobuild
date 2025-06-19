@@ -1,3 +1,4 @@
+noblearm;24.04;https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img;noble-server-cloudimg-arm64.img
 noble;24.04;https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img;noble-server-cloudimg-amd64.img
 noblemin;24.04;https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img
 jammy;22.04;https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img;jammy-server-cloudimg-amd64.img

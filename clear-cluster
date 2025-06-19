@@ -1,0 +1,17 @@
+#! /usr/bin/bash
+# vi:set nu ai ap aw smd showmatch tabstop=4 shiftwidth=4:
+
+
+                                               
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha1'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha1.tsand.org'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha2'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha2.tsand.org'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha3'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha3.tsand.org'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha4'
+ssh-keygen -f '/home/sandholm/.ssh/known_hosts' -R 'ha4.tsand.org'
+ssh -o StrictHostKeyChecking=accept-new ha1.tsand.org id
+ssh -o StrictHostKeyChecking=accept-new ha2.tsand.org id
+ssh -o StrictHostKeyChecking=accept-new ha3.tsand.org id
+ssh -o StrictHostKeyChecking=accept-new ha4.tsand.org id
