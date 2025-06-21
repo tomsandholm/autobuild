@@ -60,6 +60,8 @@ users:
     ssh-authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWmZH8E1EWcUZK91tZhhM3J7+9AMJzs+uVa6I+1lYOUDwdlFxqK2xszVGpVVN3gjtCiN/MboNLW5oUq3aT9lEtyroVqYMVtmrq+4x9sXOQ5X0YmWqw6s3MDExbLFkUJsYt/WN5ZdgadyXoPHdIjLm9B5+qGmBxW2Xo/HEfPiTG+pyO3K3mEeRB7ntqzWkDf/cJWfVE1tMZzP5RQAFGEo7A3Y7BRmaZBrYLa9r0UB2z2UhlPotk7YauIgn6AtuN1C39DPgfokzmfuuP5a/FWIyv45nazbgszzyJZ/hBQFho0t2/0SucWUkFrTncptBV6OMTqDR47NN7CtxXjqdIKxYOiKHmOAqXXk1NnUEwGFVfAo7IGqURnoFs5fIbh4JlFJhMgeJkTvrSMCLAwir+J4MsKftZhdeXzqW5EEV+IuK86OZW3nWqXoI0fzu8KOz+JW91lmwXz6Mc8hW2YA50/JRCV63MizXyspPq3dxGSQURYDmrSDAUfY6hcpmIxa5FGQ8= ansible@beast4
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDu8LECxAe9wRoroCR9wJ1Qk3hlVV68my9jTe2JJPBQfgivjg/YW4jRgNxbMQGI2VHT2zLRLrBCmfF38zwgumpnWsdkHVMoPuB7OzUGdDvBZ6Mw3AWqLWSksvdmVtf7q8DaFt98Mdl1yFXmmCwrxNHHGM0tCKxK8ZpX4El7bdY15E9+iLIpOKwpTzLv6P5n5Vujv1C0b32mqe1wwKbJUG1XRUJF7up0SEFc3iN767pgIMsGTTtI/sCDtSloKkY71FGgUT3qh1vjgSTYED/9sxoFbFq/tpoK/LWqQFIBlAp2hBbegOson8Gl/mUL/QNZqYAg0Vzg2r/tDfSso2vdi8MuAXTK/Bqnv9hDkqfDRVfnaqS/D+3fSwVC25OIWEjfk/j73y4qNx1lwYQEwDaBV5rkzi6mZnSZBwYoKsro4h+l+7vHFO/0Mma65EWhFJuZHVabVQGq3XpI8Yl0pIoA2seg3EZexeX4YR5fput9gbcBogKgU/tI4hEpMgtm/4RJH/s= root@beast4
+    groups: users,admin,wheel
+    lock_passwd: true
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
 

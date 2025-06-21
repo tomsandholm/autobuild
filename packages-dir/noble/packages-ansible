@@ -1,0 +1,11 @@
+# packages-general
+packages:
+  - apt-transport-https
+  - python3
+  - lsof
+  - netcat
+  - haveged
+  - zip
+  - net-tools
+  - ntpsec
+  - ansible
