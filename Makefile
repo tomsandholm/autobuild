@@ -46,8 +46,8 @@ DOMAIN := .tsand.org
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noble
-DISTRO := noble
-#DISTRO := noblemin
+#DISTRO := noble
+DISTRO := noblemin
 #DISTRO := bionicmin
 #DISTRO := focalmin
 #DISTRO := jammymin
@@ -84,7 +84,7 @@ SWAPSIZE := 4
 ## datadisk size
 ## in GB
 #DATASIZE := 16
-DATASIZE := 0
+DATASIZE := 16
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -98,7 +98,7 @@ ROOTSIZE := 16
 
 ## docroot disk size
 ## in GB
-WEBSIZE := 0
+WEBSIZE := 16
 
 ## guest node ram size
 RAM := 4096
