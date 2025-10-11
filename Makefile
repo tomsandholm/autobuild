@@ -181,7 +181,7 @@ clean:
 
 ## just remove a single image
 clean-image:
-	rm -rf $(IMGDIR)/$(SNAME)
+	rm -vrf $(IMGDIR)/$(SNAME)
 
 ## get our source images
 sources:	$(SRCDIR)/$(DISTRO)
@@ -314,7 +314,17 @@ $(IMGDIR)/$(SNAME)/meta-data:
 Delete:
 	@:$(call check_defined,NAME)
 	virsh destroy $(SNAME) || echo "Node stop failed for $(SNAME)"
-	virsh undefine $(SNAME) --remove-all-storage
+	@echo "##### node is destroyed #####"
+	sleep 2
+	virsh undefine $(SNAME) --remove-all-storage 
+	@echo "##### node is undefined  #####"
+	sleep 2
+	@echo "##### cleaning pools #####"
+	virsh pool-destroy $(SNAME)
+	virsh pool-destroy $(SNAME)-1
+	virsh pool-undefine $(SNAME)
+	virsh pool-undefine $(SNAME)-1
+	@echo "##### removing $(IMGDIR)/$(SNAME) #####"
 	rm -rf $(IMGDIR)/$(SNAME)
 	rm -rf $(DATADIR)/$(SNAME)
 	sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
