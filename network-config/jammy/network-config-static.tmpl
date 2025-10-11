@@ -1,16 +1,24 @@
----
-version: 1
-config:
-- type: physical
-  name: ens2
-  subnets:
-  - type: static
-    address: <IPADDRESS>
-    netmask: 255.255.255.0
-    routes:
-    - network: 0.0.0.0
-      netmask: 
-      gateway: 10.0.0.1
-- type: nameserver
-  address: [75.75.75.75]
-  search: [tsand.org]
+#cloud-config
+network:
+    version: 2
+    ethernets:
+      enp1s0:
+        dhcp4: no
+        dhcp6: no
+    bridges:
+        br0:
+            addresses:
+            - <IPADDRESS>/24
+            interfaces:
+              - enp1s0
+            nameservers:
+              addresses: 
+              - 75.75.75.75
+            parameters:
+              forward-delay: 0
+              stp: false
+            optional: true
+            routes:
+            - to: default
+              via: 10.0.0.1 
+

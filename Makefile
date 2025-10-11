@@ -45,7 +45,6 @@ DOMAIN := .tsand.org
 #DISTRO := xenial
 #DISTRO := focal
 #DISTRO := jammy
-#DISTRO := noble
 DISTRO := noble
 #DISTRO := noblemin
 #DISTRO := bionicmin
@@ -84,7 +83,7 @@ SWAPSIZE := 4
 ## datadisk size
 ## in GB
 #DATASIZE := 16
-DATASIZE := 16
+DATASIZE := 32
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -94,20 +93,21 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 16
+ROOTSIZE := 32
 
 ## docroot disk size
 ## in GB
-WEBSIZE := 16
+WEBSIZE := 0
 
 ## guest node ram size
-RAM := 4096
+RAM := 8192
 
 ## guest node cpu coount
-VCPUS := 3
+VCPUS := 6
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
+#OS-VARIANT := ubuntu20.04
 
 ## where the etc directoy lives
 ETCDIR := /etc/kvmbld
@@ -318,6 +318,9 @@ Delete:
 	rm -rf $(IMGDIR)/$(SNAME)
 	rm -rf $(DATADIR)/$(SNAME)
 	sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
+	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	make -e NAME=$(NAME) clean-image
 
 
@@ -340,4 +343,7 @@ node:	role disks network-config
 		--import \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
+	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)

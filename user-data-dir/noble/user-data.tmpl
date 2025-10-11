@@ -4,6 +4,11 @@ autoinstall:
 disable_root: 0
 ssh_pwauth: 1
 
+proxy: http://10.0.0.193:3128
+http_proxy: http://10.0.0.193:3128
+ftp_proxy: http://10.0.0.193:3128
+https_proxy: http://10.0.0.193:3128
+
 write_files:
   - path: /etc/tom
     content: |
@@ -60,6 +65,7 @@ users:
     ssh-authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWmZH8E1EWcUZK91tZhhM3J7+9AMJzs+uVa6I+1lYOUDwdlFxqK2xszVGpVVN3gjtCiN/MboNLW5oUq3aT9lEtyroVqYMVtmrq+4x9sXOQ5X0YmWqw6s3MDExbLFkUJsYt/WN5ZdgadyXoPHdIjLm9B5+qGmBxW2Xo/HEfPiTG+pyO3K3mEeRB7ntqzWkDf/cJWfVE1tMZzP5RQAFGEo7A3Y7BRmaZBrYLa9r0UB2z2UhlPotk7YauIgn6AtuN1C39DPgfokzmfuuP5a/FWIyv45nazbgszzyJZ/hBQFho0t2/0SucWUkFrTncptBV6OMTqDR47NN7CtxXjqdIKxYOiKHmOAqXXk1NnUEwGFVfAo7IGqURnoFs5fIbh4JlFJhMgeJkTvrSMCLAwir+J4MsKftZhdeXzqW5EEV+IuK86OZW3nWqXoI0fzu8KOz+JW91lmwXz6Mc8hW2YA50/JRCV63MizXyspPq3dxGSQURYDmrSDAUfY6hcpmIxa5FGQ8= ansible@beast4
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDu8LECxAe9wRoroCR9wJ1Qk3hlVV68my9jTe2JJPBQfgivjg/YW4jRgNxbMQGI2VHT2zLRLrBCmfF38zwgumpnWsdkHVMoPuB7OzUGdDvBZ6Mw3AWqLWSksvdmVtf7q8DaFt98Mdl1yFXmmCwrxNHHGM0tCKxK8ZpX4El7bdY15E9+iLIpOKwpTzLv6P5n5Vujv1C0b32mqe1wwKbJUG1XRUJF7up0SEFc3iN767pgIMsGTTtI/sCDtSloKkY71FGgUT3qh1vjgSTYED/9sxoFbFq/tpoK/LWqQFIBlAp2hBbegOson8Gl/mUL/QNZqYAg0Vzg2r/tDfSso2vdi8MuAXTK/Bqnv9hDkqfDRVfnaqS/D+3fSwVC25OIWEjfk/j73y4qNx1lwYQEwDaBV5rkzi6mZnSZBwYoKsro4h+l+7vHFO/0Mma65EWhFJuZHVabVQGq3XpI8Yl0pIoA2seg3EZexeX4YR5fput9gbcBogKgU/tI4hEpMgtm/4RJH/s= root@beast4
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/svtXB6R9pg5a/Zn3G7yfWHXPzlIrv/neRR200T9GTEgMRt0+dVZ6tzINOG4O7unXkkc3awJgyeAoEGB7Ct1P4EjgqdtAOLgPM2UEDxuXWuERmtgTAFuRz+fqAPwn1XA9KPtHkQyNV4ECqwtgMDtDde8Qhapi1+ShSk6QpKNT8eLo42yFwFLDXNaB7zX77hLXFjcHdLGbur/F0UaYsw3MqpSevuMir96eSMdLDBh0wzU9Upyf1WE31P7KMWpQPGYBEfEfhoBXRFjIA5q0Jwi63K4G3JdJACpXWNdHjZb58wugLlnW90VSWKg85NHAh1/4EtY3SL+8GzxXvDwuT4MfySIuGYAQvkmTDg7/p0amyiWDRmWfdttV+24/tn72GEOb8PIrur/cicjhOne4DOSULH4YJNqIi7x1Bn2MGoMmqM7FOd82aNiGaliFC9JgcvVnt6gjjT2Be0sRC5JZo3BCipfrxHwlWi7k6qJkBArZOpY7ERoq5e+KBmrE81rxmcc= ansible@ansible
     groups: users,admin,wheel
     lock_passwd: true
     sudo: ['ALL=(ALL) NOPASSWD:ALL']

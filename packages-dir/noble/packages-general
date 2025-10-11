@@ -3,6 +3,7 @@ packages:
   - apt-transport-https
   - python3
   - lsof
+  - network-manager
   - netcat
   - haveged
   - zip
