@@ -315,10 +315,10 @@ Delete:
 	@:$(call check_defined,NAME)
 	virsh destroy $(SNAME) || echo "Node stop failed for $(SNAME)"
 	@echo "##### node is destroyed #####"
-	sleep 2
+	sleep 1
 	virsh undefine $(SNAME) --remove-all-storage 
 	@echo "##### node is undefined  #####"
-	sleep 2
+	sleep 1
 	@echo "##### cleaning pools #####"
 	virsh pool-destroy $(SNAME)
 	virsh pool-destroy $(SNAME)-1
