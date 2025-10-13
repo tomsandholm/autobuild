@@ -1,5 +1,5 @@
 ##MAKEFLAGS += --silent
-SHELL = /bin/bash
+SHELL := /bin/bash
 
 .PHONEY:	help
 
@@ -316,7 +316,8 @@ Delete:
 	virsh destroy $(SNAME) || echo "Node stop failed for $(SNAME)"
 	@echo "##### node is destroyed #####"
 	sleep 1
-	virsh undefine $(SNAME) --remove-all-storage 
+	virsh -q snapshot-list --domain $(SNAME) | awk '{print $$1}' | xargs -n1 virsh snapshot-delete --domain $(SNAME)
+	virsh undefine $(SNAME) --remove-all-storage
 	@echo "##### node is undefined  #####"
 	sleep 1
 	@echo "##### cleaning pools #####"
@@ -357,3 +358,5 @@ node:	role disks network-config
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)
+	sleep 2
+	virsh snapshot-create-as --domain $(SNAME) --name "fresh"
