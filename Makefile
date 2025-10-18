@@ -62,7 +62,7 @@ SNAME = $(shell echo $(NAME) | cut -d'.' -f1)
 URL := $(shell egrep "^$(DISTRO);" ./distro | cut -d';' -f3)
 
 ## the IMG name of THIS $DISTRO
-SRC := $(shell egrep "^$(DISTRO)" ./distro | cut -d';' -f4)
+SRC := $(shell egrep "^$(DISTRO);" ./distro | cut -d';' -f4)
 
 ## stuff
 UUID := $(shell uuidgen)
@@ -316,7 +316,7 @@ Delete:
 	virsh destroy $(SNAME) || echo "Node stop failed for $(SNAME)"
 	@echo "##### node is destroyed #####"
 	sleep 1
-	virsh -q snapshot-list --domain $(SNAME) | awk '{print $$1}' | xargs -n1 virsh snapshot-delete --domain $(SNAME)
+	virsh -q snapshot-list --domain $(SNAME) | awk '{print $$1}' | xargs -n1 virsh snapshot-delete --domain $(SNAME) || true
 	virsh undefine $(SNAME) --remove-all-storage
 	@echo "##### node is undefined  #####"
 	sleep 1
@@ -358,5 +358,4 @@ node:	role disks network-config
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)
-	sleep 2
-	virsh snapshot-create-as --domain $(SNAME) --name "fresh"
+	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
