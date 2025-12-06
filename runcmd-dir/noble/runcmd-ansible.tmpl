@@ -3,6 +3,7 @@ runcmd:
   - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
   - update-grub
   - apt autoremove -y
+  - su -c 'mkdir .ssh' ansible
   - su -c "cd ~/.ssh && ssh-keygen -trsa -N '' -f ./id_rsa" ansible
   - su -c 'cd ~/.ssh && cat id_rsa.pub >> ./authorized_keys' ansible
   - touch /etc/cloud/cloud-init.disabled
