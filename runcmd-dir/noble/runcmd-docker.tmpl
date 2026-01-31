@@ -11,7 +11,7 @@ runcmd:
   - systemctl daemon-reload
   - service docker restart
   - sed -i 's/^agentaddress.*$/agentaddress upd:161' /etc/snmp/snmpd.conf
-  - sed -i 's/^rocommunity public 10.0.0.0/24 /etc/snmp/snmpd.conf
+  - sed -i 's/^rocommunity public 10.0.0.0/24 /etc/snmp/snmpd.conf'
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
   - eject
