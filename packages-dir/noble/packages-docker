@@ -18,3 +18,8 @@ packages:
   - binfmt-support
   - qemu-user-static
   - gh
+  - nfs-kernel-server
+  - nfs-common
+  - snmp
+  - snmpd
+  - libsnmp-dev
