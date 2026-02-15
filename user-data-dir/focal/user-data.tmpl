@@ -1,5 +1,6 @@
 ## template: jinja
 #cloud-config
+autoinstall:
 disable_root: 0
 ssh_pwauth: 1
 
@@ -10,40 +11,6 @@ write_files:
       This is another line.
     owner: root:root
     permissions: '0644'
-  - path: /root/gitlab-setup
-    content: |
-      #! /bin/bash
-      export GITLAB_ROOT_EMAIL="root@local"
-      export GITLAB_ROOT_PASSWORD="theresa1"
-      export EXTERNAL_URL="http://gitlab.tsand.org"
-      apt-get install -y gitlab-ee
-    owner: root:root
-    permissions: '0644'
-  - path: /root/haproxy.cfg
-    content: |
-      defaults
-        log global
-        maxconn 2000
-        mode http
-        option redispatch
-        option forwardfor
-        option http-server-close
-        retries 3
-        timeout http-request 10s
-        timeout queue 1m
-        timeout connect 10s
-        timeout client 1m
-        timeout server 1m
-        timeout check 10s
-
-      frontend ft_jenkins
-        bind *:80
-        default_backend bk_jenkins
-        reqadd X-Forwarded-Proto:\ http
-
-      backend bk_jenkins
-        server jenkins1 10.0.0.10:8080 check
-        server jenkins2 10.0.0.11:8080 check
 
 
 #MOUNTS
@@ -60,21 +27,44 @@ ntp:
 
 chpasswd:
   list: |
-    root:$1$xyz$quBhc72d/1S/7c2IIRk7k1
+    root:$6$/GKYIzC/ur76Lcd/$IQWC9YTbgBfGiIsNsaPLBSY1Zkz8isrWZo/AacT9chZRf7ceG4WEXggEKgFd4NYa0bUjWt9X3DVH0Pn6gSUdO0
   expire: False
 
-manage_etc_hosts: True
+manage_etc_hosts: true
 
 package_upgrade: true
 
 #ssh_pwauth: True
 
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWmZH8E1EWcUZK91tZhhM3J7+9AMJzs+uVa6I+1lYOUDwdlFxqK2xszVGpVVN3gjtCiN/MboNLW5oUq3aT9lEtyroVqYMVtmrq+4x9sXOQ5X0YmWqw6s3MDExbLFkUJsYt/WN5ZdgadyXoPHdIjLm9B5+qGmBxW2Xo/HEfPiTG+pyO3K3mEeRB7ntqzWkDf/cJWfVE1tMZzP5RQAFGEo7A3Y7BRmaZBrYLa9r0UB2z2UhlPotk7YauIgn6AtuN1C39DPgfokzmfuuP5a/FWIyv45nazbgszzyJZ/hBQFho0t2/0SucWUkFrTncptBV6OMTqDR47NN7CtxXjqdIKxYOiKHmOAqXXk1NnUEwGFVfAo7IGqURnoFs5fIbh4JlFJhMgeJkTvrSMCLAwir+J4MsKftZhdeXzqW5EEV+IuK86OZW3nWqXoI0fzu8KOz+JW91lmwXz6Mc8hW2YA50/JRCV63MizXyspPq3dxGSQURYDmrSDAUfY6hcpmIxa5FGQ8= ansible@beast4
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDu8LECxAe9wRoroCR9wJ1Qk3hlVV68my9jTe2JJPBQfgivjg/YW4jRgNxbMQGI2VHT2zLRLrBCmfF38zwgumpnWsdkHVMoPuB7OzUGdDvBZ6Mw3AWqLWSksvdmVtf7q8DaFt98Mdl1yFXmmCwrxNHHGM0tCKxK8ZpX4El7bdY15E9+iLIpOKwpTzLv6P5n5Vujv1C0b32mqe1wwKbJUG1XRUJF7up0SEFc3iN767pgIMsGTTtI/sCDtSloKkY71FGgUT3qh1vjgSTYED/9sxoFbFq/tpoK/LWqQFIBlAp2hBbegOson8Gl/mUL/QNZqYAg0Vzg2r/tDfSso2vdi8MuAXTK/Bqnv9hDkqfDRVfnaqS/D+3fSwVC25OIWEjfk/j73y4qNx1lwYQEwDaBV5rkzi6mZnSZBwYoKsro4h+l+7vHFO/0Mma65EWhFJuZHVabVQGq3XpI8Yl0pIoA2seg3EZexeX4YR5fput9gbcBogKgU/tI4hEpMgtm/4RJH/s= root@beast4
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKqXZ+SLI5aH0aYMfoIygApu28cmVH06GU91Ko6hpfBblNntam4Mi6tWolCeZLeaDmZ+/LdXWykbmOyoKq42S2SStjimkeUTqQWHt6wojPfIZwovk7zN5Vn7V8w54e0/v97fX/j9gCvDToHzx6ReJyR5uRoMJ9Cs82DlJwOE6sVpbOPnpYwlCCB7zZmi82RiXZ7pVO6C3ezcJvl3565gxqHbmcqK5uDbXx2mTFC08TUxyxWOfEeAJbhM5RD7OtmbYTL59HlzuhPhgG8jCSUq5nJvOKqhqNvDF0MzVbV2hxmiJsfvQ84fxvCTh4CWOGxUMzEv57uLdTgQeXm1Gl01FNUIPvwPaRVYUzPXyFzPrXkN19f7fTJ6pCJpw/4O35RGIL57fK4jYV0y0xPrDtRESiwColvqubIi27NAqGJwAwJzNNe696COoj8ORsEMxn5uwB68xMALK6IIJZcTk4FO13JQqD/hlIb8+JkkmqToTFmymbjPiTTiIKA6soWOxeteM= sandholm@beast4
+
 users:
-  - name: ubuntu
-    ssh-authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQ/FTCuZVu475POTFx8zNre7TkmlQwGuru/omD0HihiGG+CUsXWlYPepUF2Ihf2tXfnbUaO8qLdz0EkvJ4AHQE/i+LfikXZcqXahBErjUnc+/5TNOWDi6YGabeTZ55bu4QjuyTbMFhpaW2KDD13rYcM6I41+vo6k8C5RnR6VXjgaY7aD4M2BjqCfjalJvCha+6trxsF7sqaljWNIHmRxEXlcTN0034OCqLL4GdKPeCw4Q/lH6J9W75M+a9r/Bdbhlak+ShKs3ArrmisT0qEwCpZ+UcYvmF00CtSRCHEoeVSsTfkGJRGU03rOE+QhWcJVWq5VfoJMfnwBbrTTQiRuCm5+7xpKSC9n0DjM4p1FkG1QzpQK5FRZ0GGzUVjpxVq/1Tb3XHrTImWJFykEXJ0wOXl/7KqgtQsW5AtDcWjiJt1/yn8yDdFutCWWXGEQcWpy4Dg/B5vqmcoq52HGJZTBIeKR0mBMKPC7okMq3YA6Gcy6u+oqYXi+o8zjQYukdzRUc= sandholm@beast4
+  - name: jenkins
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
+    homedir: /home/jenkins
+    lock-passwd: false
+    ssh_pwauth: True
+    passwd: "$6$88axwcJDSo/kVNZV$.a2kSoziqBWSz8M5jKCb.eAY08SqCowXPLFlxYakCMY/gRdfE3Yq2RuLKOhovq9kIxTSPb.GSUXh97nBRQNnx."
+    chpasswd: { expire: False }
+  - name: sandholm
+    ssh-authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKqXZ+SLI5aH0aYMfoIygApu28cmVH06GU91Ko6hpfBblNntam4Mi6tWolCeZLeaDmZ+/LdXWykbmOyoKq42S2SStjimkeUTqQWHt6wojPfIZwovk7zN5Vn7V8w54e0/v97fX/j9gCvDToHzx6ReJyR5uRoMJ9Cs82DlJwOE6sVpbOPnpYwlCCB7zZmi82RiXZ7pVO6C3ezcJvl3565gxqHbmcqK5uDbXx2mTFC08TUxyxWOfEeAJbhM5RD7OtmbYTL59HlzuhPhgG8jCSUq5nJvOKqhqNvDF0MzVbV2hxmiJsfvQ84fxvCTh4CWOGxUMzEv57uLdTgQeXm1Gl01FNUIPvwPaRVYUzPXyFzPrXkN19f7fTJ6pCJpw/4O35RGIL57fK4jYV0y0xPrDtRESiwColvqubIi27NAqGJwAwJzNNe696COoj8ORsEMxn5uwB68xMALK6IIJZcTk4FO13JQqD/hlIb8+JkkmqToTFmymbjPiTTiIKA6soWOxeteM= sandholm@beast4
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDu8LECxAe9wRoroCR9wJ1Qk3hlVV68my9jTe2JJPBQfgivjg/YW4jRgNxbMQGI2VHT2zLRLrBCmfF38zwgumpnWsdkHVMoPuB7OzUGdDvBZ6Mw3AWqLWSksvdmVtf7q8DaFt98Mdl1yFXmmCwrxNHHGM0tCKxK8ZpX4El7bdY15E9+iLIpOKwpTzLv6P5n5Vujv1C0b32mqe1wwKbJUG1XRUJF7up0SEFc3iN767pgIMsGTTtI/sCDtSloKkY71FGgUT3qh1vjgSTYED/9sxoFbFq/tpoK/LWqQFIBlAp2hBbegOson8Gl/mUL/QNZqYAg0Vzg2r/tDfSso2vdi8MuAXTK/Bqnv9hDkqfDRVfnaqS/D+3fSwVC25OIWEjfk/j73y4qNx1lwYQEwDaBV5rkzi6mZnSZBwYoKsro4h+l+7vHFO/0Mma65EWhFJuZHVabVQGq3XpI8Yl0pIoA2seg3EZexeX4YR5fput9gbcBogKgU/tI4hEpMgtm/4RJH/s= root@beast4
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
+  - name: ansible
+    ssh-authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCWmZH8E1EWcUZK91tZhhM3J7+9AMJzs+uVa6I+1lYOUDwdlFxqK2xszVGpVVN3gjtCiN/MboNLW5oUq3aT9lEtyroVqYMVtmrq+4x9sXOQ5X0YmWqw6s3MDExbLFkUJsYt/WN5ZdgadyXoPHdIjLm9B5+qGmBxW2Xo/HEfPiTG+pyO3K3mEeRB7ntqzWkDf/cJWfVE1tMZzP5RQAFGEo7A3Y7BRmaZBrYLa9r0UB2z2UhlPotk7YauIgn6AtuN1C39DPgfokzmfuuP5a/FWIyv45nazbgszzyJZ/hBQFho0t2/0SucWUkFrTncptBV6OMTqDR47NN7CtxXjqdIKxYOiKHmOAqXXk1NnUEwGFVfAo7IGqURnoFs5fIbh4JlFJhMgeJkTvrSMCLAwir+J4MsKftZhdeXzqW5EEV+IuK86OZW3nWqXoI0fzu8KOz+JW91lmwXz6Mc8hW2YA50/JRCV63MizXyspPq3dxGSQURYDmrSDAUfY6hcpmIxa5FGQ8= ansible@beast4
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDu8LECxAe9wRoroCR9wJ1Qk3hlVV68my9jTe2JJPBQfgivjg/YW4jRgNxbMQGI2VHT2zLRLrBCmfF38zwgumpnWsdkHVMoPuB7OzUGdDvBZ6Mw3AWqLWSksvdmVtf7q8DaFt98Mdl1yFXmmCwrxNHHGM0tCKxK8ZpX4El7bdY15E9+iLIpOKwpTzLv6P5n5Vujv1C0b32mqe1wwKbJUG1XRUJF7up0SEFc3iN767pgIMsGTTtI/sCDtSloKkY71FGgUT3qh1vjgSTYED/9sxoFbFq/tpoK/LWqQFIBlAp2hBbegOson8Gl/mUL/QNZqYAg0Vzg2r/tDfSso2vdi8MuAXTK/Bqnv9hDkqfDRVfnaqS/D+3fSwVC25OIWEjfk/j73y4qNx1lwYQEwDaBV5rkzi6mZnSZBwYoKsro4h+l+7vHFO/0Mma65EWhFJuZHVabVQGq3XpI8Yl0pIoA2seg3EZexeX4YR5fput9gbcBogKgU/tI4hEpMgtm/4RJH/s= root@beast4
+    groups: users,admin,wheel
+    lock_passwd: true
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
+
 
 #RUNCMD
 
