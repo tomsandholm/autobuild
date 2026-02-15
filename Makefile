@@ -1,7 +1,8 @@
 ##MAKEFLAGS += --silent
 SHELL := /bin/bash
+.ONESHELL:
 
-.PHONEY:	help
+.PHONEY:	help backup
 
 PRIMARY := ''
 NLIST := ''
@@ -334,6 +335,19 @@ Delete:
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	make -e NAME=$(NAME) clean-image
 
+## backup a node
+backup:
+	@:$(call check_defined,NAME)
+	mkdir -p bdir
+	cd bdir
+	mkdir -p $(SNAME)
+	cd $(SNAME)
+	virsh shutdown $(SNAME)
+	sleep 10
+	virsh dumpxml $(SNAME) > ./$(SNAME)_vm.xml
+	get-src-file $(SNAME)_vm.xml > files
+	tar cvfz dump.tgz -T ./files
+
 
 ## create a node using virt-install
 node:	role disks network-config
@@ -359,3 +373,4 @@ node:	role disks network-config
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
+
