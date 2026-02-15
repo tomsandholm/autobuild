@@ -342,13 +342,24 @@ backup:
 	cd bdir
 	mkdir -p $(SNAME)
 	cd $(SNAME)
-	virsh shutdown $(SNAME)
-	sleep 10
+	@echo ">>>>> make dumpxml of node $(SNAME)"
 	virsh dumpxml $(SNAME) > ./$(SNAME)_vm.xml
-	get-src-file $(SNAME)_vm.xml > files
+	@echo ">>>>> shutdown $(SNAME)"
+	virsh shutdown $(SNAME)
+	sleep 5
+	@echo ">>>>> extract 'source file' lines"
+	get-src-file $(SNAME)_vm.xml > files-all
+	cat ./files-all | sed '/base/d' > files
+	echo "./$(SNAME)_vm.xml" >> files
 	tar cvfz dump.tgz -T ./files
+	virsh start $(SNAME)
 
-
+## create a live backup of the disks configured on the node
+## they are placed parallel to the source file, with a timestamp suffix
+live-backup:
+	@:$(call check_defined,NAME)
+	virsh backup-begin $(SNAME)
+	
 ## create a node using virt-install
 node:	role disks network-config
 	@:$(call check_defined,NAME)
