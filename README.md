@@ -1,2 +1,29 @@
 # autobuild
 Tools to automate build of ubuntu kvm virtual machines
+
+This code was started when I was using Suse linux.
+It is currently running on Kubuntu 24.04.
+KVM Must be configured and enabled.
+A host brige is a MUST, named br0.
+I have used this tool using static addresses, thus the defaults 
+in the Makefile are set for static.
+You MUST put the ip-address and FQDN into the /etc/hosts of 
+the new VM you are creating.  The tool uses "getent" to fetch
+entries from /etc/hosts.
+You must create directory "/data" and have FULL WRITE permsision
+You must setup directory /var/lib/kvmbld so you have FULL WRITE permission
+You must install the full libvirt suite.
+The tool uses virt-install to create kvm-nodes.
+The tool uses virsh to manage the vms.
+
+syntax:
+
+make -e NAME=FQDN ROLE=general node
+--> this create host FQDN as a general build node
+
+make -e NAME=FQDN ROLE=docker node
+--> this creates host FQDN as a docker node that supports docker-in-docker
+
+Why do I do this?
+It's fun.
+
