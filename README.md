@@ -24,6 +24,10 @@ make -e NAME=FQDN ROLE=general node
 make -e NAME=FQDN ROLE=docker node
 --> this creates host FQDN as a docker node that supports docker-in-docker
 
+To add a distribution:
+Edit the distro file and save the label, url, etc for the desired distro.
+Take a look at the distro-vendors cloud page for cloud-images
+
 Why do I do this?
 It's fun.
 
