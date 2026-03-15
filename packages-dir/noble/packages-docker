@@ -23,3 +23,13 @@ packages:
   - snmp
   - snmpd
   - libsnmp-dev
+  - qemu-system
+  - qemu-utils
+  - libvirt-clients
+  - libvirt-daemon-system
+  - virtinst
+  - bridge-utils
+  - libosinfo-bin
+  - libguestfs-tools
+  - x11-xserver-utils
+  - virt-manager

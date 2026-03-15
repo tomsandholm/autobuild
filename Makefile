@@ -79,12 +79,12 @@ ENV := dev
 
 ## swapdisk size
 ## in GB
-SWAPSIZE := 4
+SWAPSIZE := 8
 
 ## datadisk size
 ## in GB
 #DATASIZE := 16
-DATASIZE := 32
+DATASIZE := 8
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -94,17 +94,17 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 32
+ROOTSIZE := 16
 
 ## docroot disk size
 ## in GB
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 8192
+RAM := 16384
 
 ## guest node cpu coount
-VCPUS := 6
+VCPUS := 8
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
@@ -382,6 +382,7 @@ node:	role disks network-config
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+	echo "/home/ansible/bin/lb-install $(NAME)" | ssh ansible@ansible at now +1 minute
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 

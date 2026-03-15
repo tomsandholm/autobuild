@@ -10,13 +10,20 @@ ftp_proxy: http://10.0.0.193:3128
 https_proxy: http://10.0.0.193:3128
 
 write_files:
-  - path: /etc/tom
+  - path: /etc/environment
     content: |
-      This is data from the installation.
-      This is another line.
+      HTTP_PROXY="http://10.0.0.193:3128"
+      HTTPS_PROXY="http://10.0.0.193:3128"
+      NO_PROXY="localhost,127.0.0.1"
     owner: root:root
     permissions: '0644'
 
+  - path: /root/.gitconfig
+    content: |
+      [http]
+        proxy = http://10.0.0.193:3128
+    permissions: '0600'
+    owner: root
 
 #MOUNTS
 
