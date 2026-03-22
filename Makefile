@@ -6,6 +6,7 @@ SHELL := /bin/bash
 
 PRIMARY := ''
 NLIST := ''
+SUB := 'general'
 
 check_defined = \
   $(strip $(foreach 1,$1, \
@@ -84,7 +85,7 @@ SWAPSIZE := 8
 ## datadisk size
 ## in GB
 #DATASIZE := 16
-DATASIZE := 8
+DATASIZE := 16
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -94,14 +95,14 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 16
+ROOTSIZE := 64
 
 ## docroot disk size
 ## in GB
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 16384
+RAM := 32768
 
 ## guest node cpu coount
 VCPUS := 8
@@ -382,7 +383,8 @@ node:	role disks network-config
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
-	echo "/home/ansible/bin/lb-install $(NAME)" | ssh ansible@ansible at now +1 minute
+	#echo "/home/ansible/bin/lb-install $(NAME)" | ssh ansible@ansible at now +1 minute
+	echo "/home/ansible/bin/setup $(SUB) $(NAME)" | ssh ansible@ansible at now +1 minute
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 
