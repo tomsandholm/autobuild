@@ -16,6 +16,13 @@ You must install the full libvirt suite.
 The tool uses virt-install to create kvm-nodes.
 The tool uses virsh to manage the vms.
 
+Features:
+Distro is downloaded on-the-fly, based on settings in distro file
+Cloud-image is used as backing store for nodes rootfs.
+Each node rootfs is backed to the cloud-image, this results is shared images when multiple nodes using the same.
+Auto registration with Ansible server.
+Auto snapshot after install
+
 syntax:
 
 make -e NAME=FQDN ROLE=general node  
