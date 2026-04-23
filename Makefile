@@ -44,15 +44,15 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-#DISTRO := xenial
+DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
-DISTRO := noble
 #DISTRO := noblemin
 #DISTRO := bionicmin
 #DISTRO := focalmin
 #DISTRO := jammymin
 #DISTRO := bionic
+#DISTRO := xenial
 
 ## graphics
 GRAPHICS := none
@@ -383,8 +383,18 @@ node:	role disks network-config
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
-	#echo "/home/ansible/bin/lb-install $(NAME)" | ssh ansible@ansible at now +1 minute
-	echo "/home/ansible/bin/setup $(SUB) $(NAME)" | ssh ansible@ansible at now +1 minute
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 
+snapshot:
+	@:$(call check_defined,NAME)
+	#virsh shutdown $(SNAME)
+	virsh snapshot-create-as --domain $(SNAME) "auto-snap" --description "makefile snapshot" --diskspec vda,snapshot=internal
+	virsh start $(SNAME)
+
+librebooking:
+	@:$(call check_defined,NAME)
+	ssh ansible@ansible "cd ansible/playbooks; \
+	ansible-playbook --limit $(NAME) librebooking-mysql.yml; \
+	ansible-playbook --limit $(NAME) librebooking-apache2.yml; \
+	ansible-playbook --limit $(NAME) librebooking-php.yml;"
