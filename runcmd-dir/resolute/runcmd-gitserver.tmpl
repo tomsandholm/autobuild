@@ -1,0 +1,11 @@
+runcmd:
+  - echo '{{ ds.meta_data.role }}' > /etc/role
+  - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
+  - update-grub
+  - apt autoremove -y
+  - touch /etc/cloud/cloud-init.disabled
+  - cd /home/sandholm && chown -R sandholm:sandholm .
+  - cd /home/git && chown -R git:git .
+  - cat /home/sandholm/.ssh/authorized_keys >> /home/git/.ssh/authorized_keys
+  - eject
+  - shutdown -h now

@@ -1,0 +1,27 @@
+# packages-docker
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl 
+  - software-properties-common
+  - lsb-release
+  - python3
+  - lsof
+  - netcat
+  - haveged
+  - xinetd
+  - zip
+  - net-tools
+  - openjdk-21-jdk
+  - build-essential
+  - binfmt-support
+  - nfs-kernel-server
+  - nfs-common
+  - libvirt-clients
+  - libvirt-daemon-system
+  - virtinst
+  - bridge-utils
+  - libosinfo-bin
+  - libguestfs-tools
+  - x11-xserver-utils
+  - virt-manager

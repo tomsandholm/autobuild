@@ -1,0 +1,10 @@
+bootcmd:
+ - mkswap /dev/vdb
+ - swapon /dev/vdb
+ - pvcreate /dev/vdc
+ - vgcreate vggit /dev/vdc
+ - lvcreate --name lvgit -l 100%FREE vggit
+ - mke2fs -j /dev/vggit/lvgit
+ - apt-get install -y gh
+ - apt-get update
+

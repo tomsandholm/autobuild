@@ -44,7 +44,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-DISTRO := noble
+DISTRO := resolute
+#DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin

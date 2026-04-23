@@ -7,7 +7,14 @@ runcmd:
   - sed -i 's@^ExecStart=.*@ExecStart=/usr/bin/dockerd --tls=false -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock@g' /lib/systemd/system/docker.service
   - systemctl daemon-reload
   - service docker restart
+  - systemctl stop snmpd
+  - snap install lxd
+  - sed -i 's/^agentaddress.*$/agentaddress udp:161/g' /etc/snmp/snmpd.conf
+  - sed -i '0,/rocommunity/ s///' /etc/snmp/snmpd.conf
+  - sed -i 's@^rocommunity.*$@rocommunity public 10.0.0.0/24@g' /etc/snmp/snmpd.conf
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
+  - usermod -aG libvirt sandholm
+  - usermod -aG lxd sandholm
   - eject
   - shutdown -h now

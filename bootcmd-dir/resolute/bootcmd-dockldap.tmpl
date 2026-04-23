@@ -1,0 +1,14 @@
+bootcmd:
+ - mkswap /dev/vdb
+ - swapon /dev/vdb
+ - pvcreate /dev/vdc
+ - vgcreate vgdocker /dev/vdc
+ - lvcreate --name lvdocker -l 100%FREE vgdocker
+ - mke2fs -j /dev/vgdocker/lvdocker
+ - pvcreate /dev/vdd
+ - vgcreate vgopenldap /dev/vdd
+ - lvcreate --name lvopenldap -l 100%FREE vgopenldap
+ - mke2fs -j /dev/vgopenldap/lvopenldap
+ - apt-get install -y gh
+ - apt-get update
+

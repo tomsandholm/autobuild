@@ -1,0 +1,20 @@
+# packages-docker
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl 
+  - software-properties-common
+  - lsb-release
+  - python3
+  - lsof
+  - netcat
+  - haveged
+  - xinetd
+  - zip
+  - net-tools
+  - openjdk-17-jdk
+  - build-essential
+  - qemu
+  - binfmt-support
+  - qemu-user-static
+  - gh
