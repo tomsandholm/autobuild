@@ -35,6 +35,12 @@ make -e NAME=FQDN ROLE=general node
 make -e NAME=FQDN ROLE=docker node  
 --> this creates host FQDN as a docker node that supports docker-in-docker
 
+make -e NAME=FQDN Delete
+--> this deletes the node
+
+You may directly edit the Makefile and set the DISTRO, RAM, VCPU sizes or you may pass them on the command line.
+
+
 To add a distribution:  
 Edit the distro file and save the label, url, etc for the desired distro.
 Take a look at the distro-vendors cloud page for cloud-images
