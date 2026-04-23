@@ -9,3 +9,4 @@ packages:
   - zip
   - net-tools
   - ntpsec
+  - build-essential

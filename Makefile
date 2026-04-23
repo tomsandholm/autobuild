@@ -96,17 +96,17 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 64
+ROOTSIZE := 32
 
 ## docroot disk size
 ## in GB
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 32768
+RAM := 4096
 
 ## guest node cpu coount
-VCPUS := 8
+VCPUS := 2
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
@@ -131,8 +131,8 @@ IMGDIR := $(VARDIR)/images
 SRCDIR := $(VARDIR)/sources
 
 ## either static or dhcp
-NET := static
-#NET := dhcp
+#NET := static
+NET := dhcp
 
 ## command to pass virt-install for swap disk allocation
 SWAPDISK := --disk path=$(IMGDIR)/$(SNAME)/swap.qcow2,device=disk,bus=virtio
@@ -331,10 +331,10 @@ Delete:
 	@echo "##### removing $(IMGDIR)/$(SNAME) #####"
 	rm -rf $(IMGDIR)/$(SNAME)
 	rm -rf $(DATADIR)/$(SNAME)
-	sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
-	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
-	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
-	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+	#sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
+	#scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	make -e NAME=$(NAME) clean-image
 
 ## backup a node
@@ -380,10 +380,10 @@ node:	role disks network-config
 		--graphics $(GRAPHICS) \
 		--import \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
-	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
-	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
-	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
-	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+#	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
+#	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+#	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+#	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 
