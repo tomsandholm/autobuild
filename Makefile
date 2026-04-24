@@ -234,6 +234,8 @@ $(IMGDIR)/$(SNAME)/user-data:
 	sed "/RUNCMD/r runcmd-dir/$(DISTRO)/runcmd-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data.tmp1
 	sed "/APT/r ./apt-dir/$(DISTRO)/apt-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/SSHKEY/r ~/.ssh/id_rsa.pub" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data
 
 ## pull all the disk stuff together
