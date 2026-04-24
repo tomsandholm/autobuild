@@ -1,0 +1,43 @@
+What it is
+autobuild is a Makefile-driven toolkit for creating Ubuntu KVM guests on a libvirt host. It downloads official Ubuntu cloud images, builds per-VM qcow2 disks (root + optional swap/data/db/web), stitches together cloud-init (user-data, meta-data, network-config), and runs virt-install --import --cloud-init so the VM boots already configured. It is wired to your environment: tsand.org DNS, a local HTTP proxy in templates, SSH keys, and Ansible (inventory lines and a remote ansible host).
+
+There is almost no application code beyond Make, shell one-liners, and template/sed assembly.
+
+How a VM is built (main pipeline)
+distro — Maps a short name (DISTRO, e.g. noble, resolute) to a cloud image URL and filename. Makefile reads this with egrep/cut.
+
+sources → base → image — Downloads the image into $(SRCDIR), copies it to a base qcow2 under $(BASEDIR), then for each node creates a backing root disk under $(IMGDIR)/$(SNAME) (optionally resized with qemu-img resize).
+
+role — The heart of customization. Starting from user-data-dir/$(DISTRO)/user-data.tmpl, it sed-inlines fragments from:
+
+packages-dir/$(DISTRO)/packages-$(ROLE)
+bootcmd-dir/..., mounts-dir/..., runcmd-dir/..., apt-dir/...
+Placeholders in the template are #PACKAGES, #BOOTCMD, #MOUNTS, #RUNCMD, #APT.
+disks — Optionally creates swap, data (under DATADIR), db / dblog, docroot qcow2s when the corresponding *SIZE variables are non-zero.
+
+network-config — Either static (requires NAME to resolve via getent hosts for IPADDRESS) or DHCP, from network-config/$(DISTRO)/ templates.
+
+meta-data — Writes instance id, hostname from NAME, injects ROLE / ENV, and your ~/.ssh/id_rsa.pub.
+
+node — Runs virt-install with the disks and cloud-init files, appends the host to /etc/ansible/hosts, syncs inventory to a remote Ansible machine, runs sshreset, starts the VM, and creates a fresh snapshot.
+
+Other targets include Delete (destroy VM, pools, image dirs, prune Ansible), backup / live-backup, snapshot, and a librebooking playbook shortcut.
+
+Important directories
+Area	Role
+user-data-dir/<distro>/
+Base #cloud-config / autoinstall templates per Ubuntu release
+packages-dir/, bootcmd-dir/, mounts-dir/, runcmd-dir/, apt-dir/
+Role-specific slices (e.g. docker, jenkins, gluster, general)
+network-config/<distro>/
+Static vs DHCP network templates
+tools/
+Separate small Makefile/tools (certs, server info)
+Configuration knobs (Makefile)
+You set NAME (FQDN; short name becomes libvirt domain name), DISTRO, ROLE, ENV, RAM/VCPUs, disk sizes (ROOTSIZE, SWAPSIZE, DATASIZE, …), NET, and paths like ETCDIR, VARDIR, DATADIR. Defaults point at /var/lib/kvmbld-style layout and qemu:///system.
+
+Caveats
+setup in the repo root is not a shell “setup script”; it reads like captured Ansible JSON output (large file).
+Templates contain secrets (password hashes, SSH public keys, proxy URLs) — treat the repo as sensitive if it matches production.
+noblemin line in distro is missing a trailing ;filename field unlike others; that could break cut -f4 for that row depending on use.
+In one sentence: autobuild is your personal “Ubuntu cloud image → qcow2 + cloud-init by role → virt-install + Ansible hook” factory for KVM lab/production nodes.
