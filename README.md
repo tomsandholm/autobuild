@@ -23,8 +23,8 @@ The tool uses virsh to manage the vms.
 Features:
 Distro is downloaded on-the-fly, based on settings in distro file
 Cloud-image is used as backing store for nodes rootfs.
-Each node rootfs is backed to the cloud-image, this results is shared images when multiple nodes using the same.
-Auto registration with Ansible server.
+Each node rootfs is backed to the cloud-image, this results is shared images when multiple nodes using the same.  
+Auto registration with Ansible server.  (turned off in WSL branch)  
 Auto snapshot after install
 
 syntax:
