@@ -44,8 +44,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-#DISTRO := resolute
-DISTRO := noble
+DISTRO := resolute
+#DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin
@@ -59,8 +59,8 @@ DISTRO := noble
 # this will use the apt-dir/(DISTRO)/apt-(ROLE)-proxy.tmpl and
 # user-data-dir/(DISTRO)/user-data-proxy.tmpl
 # if set true, otherwise the same tmpl files without -proxy
-PROXY := true
-#PROXY := none
+#PROXY := true
+PROXY := none
 
 ## graphics
 GRAPHICS := none

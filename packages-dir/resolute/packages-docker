@@ -25,3 +25,4 @@ packages:
   - libguestfs-tools
   - x11-xserver-utils
   - virt-manager
+  - docker.io
