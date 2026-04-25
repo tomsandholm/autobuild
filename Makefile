@@ -56,6 +56,9 @@ DISTRO := resolute
 #DISTRO := xenial
 
 # whether to use proxy
+# this will use the apt-dir/(DISTRO)/apt-(ROLE)-proxy.tmpl and
+# user-data-dir/(DISTRO)/user-data-proxy.tmpl
+# if set true, otherwise the same tmpl files without -proxy
 #PROXY := true
 PROXY := none
 
