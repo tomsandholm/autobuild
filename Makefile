@@ -55,6 +55,10 @@ DISTRO := resolute
 #DISTRO := bionic
 #DISTRO := xenial
 
+# whether to use proxy
+#PROXY := true
+PROXY := none
+
 ## graphics
 GRAPHICS := none
 
@@ -224,6 +228,7 @@ role:	$(IMGDIR)/$(SNAME)/user-data
 
 # install packages-$(ROLE)
 $(IMGDIR)/$(SNAME)/user-data:
+ifeq ($(PROXY),none)
 	cp user-data-dir/$(DISTRO)/user-data.tmpl user-data.tmp1
 	sed "/PACKAGES/r packages-dir/$(DISTRO)/packages-$(ROLE)" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data.tmp1
@@ -237,6 +242,21 @@ $(IMGDIR)/$(SNAME)/user-data:
 	cp user-data.tmp2 user-data.tmp1
 	sed "/SSHKEY/r ~/.ssh/id_rsa.pub" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data
+else
+	cp user-data-dir/$(DISTRO)/user-data-proxy.tmpl user-data.tmp1
+	sed "/PACKAGES/r packages-dir/$(DISTRO)/packages-$(ROLE)" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/BOOTCMD/r bootcmd-dir/$(DISTRO)/bootcmd-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/MOUNTS/r mounts-dir/$(DISTRO)/mounts-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/RUNCMD/r runcmd-dir/$(DISTRO)/runcmd-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/APT/r ./apt-dir/$(DISTRO)/apt-$(ROLE)-proxy.tmpl" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data.tmp1
+	sed "/SSHKEY/r ~/.ssh/id_rsa.pub" user-data.tmp1 > user-data.tmp2
+	cp user-data.tmp2 user-data
+endif
 
 ## pull all the disk stuff together
 disks:	rootfs swap data db dblog web

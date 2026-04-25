@@ -4,33 +4,34 @@ autoinstall:
 disable_root: 0
 ssh_pwauth: 1
 
+proxy: http://10.0.0.193:3128
+http_proxy: http://10.0.0.193:3128
+ftp_proxy: http://10.0.0.193:3128
+https_proxy: http://10.0.0.193:3128
+
+write_files:
+  - path: /etc/environment
+    content: |
+      HTTP_PROXY="http://10.0.0.193:3128"
+      HTTPS_PROXY="http://10.0.0.193:3128"
+      NO_PROXY="localhost,127.0.0.1"
+    owner: root:root
+    permissions: '0644'
+
+  - path: /root/.gitconfig
+    content: |
+      [http]
+        proxy = http://10.0.0.193:3128
+    permissions: '0600'
+    owner: root
+
 #MOUNTS
-mounts:
-  - ["/dev/vdb", "none", "swap", "sw", "0", "0"]
 
 #PACKAGES
-# packages-general
-packages:
-  - apt-transport-https
-  - python3
-  - lsof
-  - network-manager
-  - netcat
-  - haveged
-  - zip
-  - net-tools
-  - ntpsec
 
 #BOOTCMD
-bootcmd:
- - mkswap /dev/vdb
- - swapon /dev/vdb
 
 #APT
-apt:
-#  http_proxy: "http://10.0.0.193:3128"
-#  https_proxy: "http://10.0.0.193:3128"
-
 
 ntp:
   enabled: true
@@ -84,13 +85,5 @@ users:
 
 
 #RUNCMD
-runcmd:
-  - echo '{{ ds.meta_data.role }}' > /etc/role
-  - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
-  - update-grub
-  - apt autoremove -y
-  - touch /etc/cloud/cloud-init.disabled
-  - eject
-  - shutdown -h now
 
 
