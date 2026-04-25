@@ -411,6 +411,9 @@ node:	role disks network-config
 #	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
+	echo "##### The node is up"
+	echo "##### The node IP address is: "
+	make -e NAME=$(NAME) get-ip
 
 snapshot:
 	@:$(call check_defined,NAME)
@@ -424,3 +427,7 @@ librebooking:
 	ansible-playbook --limit $(NAME) librebooking-mysql.yml; \
 	ansible-playbook --limit $(NAME) librebooking-apache2.yml; \
 	ansible-playbook --limit $(NAME) librebooking-php.yml;"
+
+get-ip:
+	@:$(call check_defined,NAME)
+	virsh net-dhcp-leases default | grep $(SNAME) | awk '{print $$5}' | sed 's@/.*$$@@g'
