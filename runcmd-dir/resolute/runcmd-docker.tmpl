@@ -11,6 +11,7 @@ runcmd:
   - sed -i 's/^agentaddress.*$/agentaddress udp:161/g' /etc/snmp/snmpd.conf
   - sed -i '0,/rocommunity/ s///' /etc/snmp/snmpd.conf
   - sed -i 's@^rocommunity.*$@rocommunity public 10.0.0.0/24@g' /etc/snmp/snmpd.conf
+  - update-ca-certificates
   - touch /etc/cloud/cloud-init.disabled
   - usermod -aG docker sandholm
   - usermod -aG libvirt sandholm
