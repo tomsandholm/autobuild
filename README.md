@@ -22,6 +22,8 @@ Cloud-image is used as backing store for nodes rootfs.
 Each node rootfs is backed to the cloud-image, this results is shared images when multiple nodes using the same.
 Auto registration with Ansible server.
 Auto snapshot after install
+Proxy is enabled and declared in apt-dir/(DISTRO)/apt-(ROLE)-proxy.tmpl and  
+user-data-dir/(DISTRO)/user-data-proxy.tmpl
 
 syntax:
 
