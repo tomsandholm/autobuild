@@ -412,7 +412,6 @@ node:	role disks network-config
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 	echo "##### The node is up"
-	echo "##### The node IP address is: "
 	make -e NAME=$(NAME) get-ip
 
 snapshot:
@@ -430,4 +429,5 @@ librebooking:
 
 get-ip:
 	@:$(call check_defined,NAME)
+	echo "##### The node IP address is: "
 	virsh net-dhcp-leases default | grep $(SNAME) | awk '{print $$5}' | sed 's@/.*$$@@g'
