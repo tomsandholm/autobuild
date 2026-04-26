@@ -109,7 +109,7 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 64
+ROOTSIZE := 32
 
 ## docroot disk size
 ## in GB
@@ -144,8 +144,8 @@ IMGDIR := $(VARDIR)/images
 SRCDIR := $(VARDIR)/sources
 
 ## either static or dhcp
-NET := static
-#NET := dhcp
+#NET := static
+NET := dhcp
 
 ## command to pass virt-install for swap disk allocation
 SWAPDISK := --disk path=$(IMGDIR)/$(SNAME)/swap.qcow2,device=disk,bus=virtio
