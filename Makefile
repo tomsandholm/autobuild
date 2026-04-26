@@ -62,6 +62,12 @@ DISTRO := resolute
 PROXY := true
 #PROXY := none
 
+# whether to register with ansible server
+# this will enable or disable the ansible registration.
+ANSIBLE := true
+#ANSIBLE := false
+
+
 ## graphics
 GRAPHICS := none
 
@@ -405,10 +411,15 @@ node:	role disks network-config
 		--graphics $(GRAPHICS) \
 		--import \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
+ifeq ($(ANSIBLE),true) 
+	echo "##### registering with Ansible server"
 	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+else
+	echo "##### skipping registration with Ansible server"
+endif
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
 
