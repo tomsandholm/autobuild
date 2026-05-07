@@ -1,45 +1,100 @@
-# autobuild
+# Autobuild
 
-# NOTE:  use branch wsl for building under wsl2
+`autobuild` is a Makefile-driven toolkit designed to automate the creation and deployment of Ubuntu KVM virtual machines on a libvirt host. It streamlines the process of downloading cloud images, configuring disks, assembling cloud-init metadata, and provisioning VMs with specific roles.
 
-Tools to automate build of ubuntu kvm virtual machines
+## Features
 
-This code was started when I was using Suse linux.
-It is currently running on Kubuntu 24.04.
-KVM Must be configured and enabled.
-A host brige is a MUST, named br0.
-I have used this tool using static addresses, thus the defaults 
-in the Makefile are set for static.
-You MUST put the ip-address and FQDN into the /etc/hosts of 
-the new VM you are creating.  The tool uses "getent" to fetch
-entries from /etc/hosts.
-You must create directory "/data" and have FULL WRITE permsision
-You must setup directory /var/lib/kvmbld so you have FULL WRITE permission
-You must install the full libvirt suite.
-The tool uses virt-install to create kvm-nodes.
-The tool uses virsh to manage the vms.
+- **Automated Provisioning**: Uses `virt-install` and `cloud-init` for "boot-and-go" VM creation.
+- **Role-Based Configuration**: Tailors VMs (packages, boot commands, mounts, etc.) based on a defined `ROLE` (e.g., `docker`, `jenkins`, `gluster`).
+- **Disk Management**: Automatically creates and attaches root, swap, data, database, and web document root disks.
+- **Network Flexibility**: Supports both static and DHCP network configurations via templates.
+- **Ansible Integration**: Automatically registers new nodes in an Ansible inventory and triggers SSH key resets.
+- **Snapshots**: Automatically creates a "fresh" snapshot after the initial installation.
+- **Proxy Support**: Optional proxy configuration for APT and cloud-init.
 
-Features:  
-Distro is downloaded on-the-fly, based on settings in distro file.  
-Cloud-image is used as backing store for nodes rootfs.  
-Each node rootfs is backed to the cloud-image, this results is shared images when multiple nodes using the same.  
-Auto registration with Ansible server.  
-Auto snapshot after install.  
-Proxy is enabled (via Makefile-PROXY:=true) and declared in apt-dir/(DISTRO)/apt-(ROLE)-proxy.tmpl and  
-user-data-dir/(DISTRO)/user-data-proxy.tmpl
+## Prerequisites
 
-syntax:
+- **Host OS**: Ubuntu/Kubuntu (tested on 24.04).
+- **KVM/Libvirt**: Must be installed, configured, and enabled.
+- **Network Bridge**: A host bridge named `br0` is required.
+- **Permissions**: Full write access to:
+  - `/data` (or configured `DATADIR`)
+  - `/var/lib/kvmbld` (or configured `VARDIR`)
+- **DNS/Hosts**: For static IP setups, the FQDN must be resolvable (e.g., in `/etc/hosts`) so the Makefile can determine the IP address.
 
-make -e NAME=FQDN ROLE=general node  
---> this create host FQDN as a general build node
+## Directory Structure
 
-make -e NAME=FQDN ROLE=docker node  
---> this creates host FQDN as a docker node that supports docker-in-docker
+| Directory | Description |
+| :--- | :--- |
+| `user-data-dir/` | Base `cloud-config` templates per distribution. |
+| `packages-dir/` | Lists of packages to install, organized by distribution and role. |
+| `bootcmd-dir/` | Role-specific boot command fragments. |
+| `mounts-dir/` | Role-specific mount configurations. |
+| `runcmd-dir/` | Role-specific run command fragments. |
+| `apt-dir/` | Role-specific APT configuration fragments. |
+| `network-config/` | Templates for static and DHCP network configurations. |
+| `tools/` | Supplemental scripts and tools. |
 
-To add a distribution:  
-Edit the distro file and save the label, url, etc for the desired distro.
-Take a look at the distro-vendors cloud page for cloud-images
+## Key Makefile Variables
 
-Why do I do this?  
-It's fun.
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `NAME` | (Required) | The FQDN of the VM. |
+| `DISTRO` | `noble` | The Ubuntu distribution (e.g., `focal`, `jammy`, `noble`). |
+| `ROLE` | `general` | The role of the VM (determines configuration fragments). |
+| `ENV` | `dev` | The environment tag (e.g., `dev`, `prod`). |
+| `RAM` | `4096` | RAM in MB. |
+| `VCPUS` | `4` | Number of virtual CPUs. |
+| `ROOTSIZE` | `32` | Root disk size in GB. |
+| `SWAPSIZE` | `8` | Swap disk size in GB. |
+| `DATASIZE` | `16` | Data disk size in GB. |
+| `NET` | `static` | Network type (`static` or `dhcp`). |
+| `PROXY` | `true` | Enable/disable proxy templates. |
+| `ANSIBLE` | `true` | Enable/disable Ansible registration. |
 
+## Usage
+
+### Creating a Node
+
+To create a new VM, provide the FQDN and optionally the role:
+
+```bash
+make -e NAME=node01.tsand.org ROLE=docker node
+```
+
+### Deleting a Node
+
+This will destroy the VM, remove its storage, and clean up Ansible entries:
+
+```bash
+make -e NAME=node01.tsand.org Delete
+```
+
+### Listing Images
+
+```bash
+make list
+```
+
+### Creating a Snapshot
+
+```bash
+make -e NAME=node01.tsand.org snapshot
+```
+
+### Backup
+
+```bash
+make -e NAME=node01.tsand.org backup
+```
+
+## How it Works
+
+1. **Sources**: Downloads the official Ubuntu cloud image if not present.
+2. **Base**: Prepares a base qcow2 image from the source.
+3. **Image**: Creates a node-specific root disk using the base image as a backing file and resizes it.
+4. **Role**: Assembles a `user-data` file by inlining fragments from various directories based on the `ROLE` and `DISTRO`.
+5. **Disks**: Creates additional disks (swap, data, etc.) as configured.
+6. **Network**: Generates `network-config` and `meta-data` files.
+7. **Node**: Runs `virt-install` with all prepared disks and cloud-init configurations.
+8. **Finalize**: Registers the node with Ansible and starts the VM.
