@@ -1,4 +1,7 @@
 # autobuild
+
+# NOTE:  use branch wsl for building under wsl2
+
 Tools to automate build of ubuntu kvm virtual machines
 
 This code was started when I was using Suse linux.
