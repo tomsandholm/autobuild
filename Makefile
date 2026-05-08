@@ -387,6 +387,18 @@ backup:
 	tar cvfz dump.tgz -T ./files
 	virsh start $(SNAME)
 
+## restore a node
+restore:
+	@:$(call check_defined,NAME)
+	@echo ">>>>> restoring node $(SNAME) from bdir/$(SNAME)"
+	@if [ ! -d bdir/$(SNAME) ]; then echo "Backup directory bdir/$(SNAME) does not exist"; exit 1; fi
+	@if [ ! -f bdir/$(SNAME)/dump.tgz ]; then echo "Backup file bdir/$(SNAME)/dump.tgz does not exist"; exit 1; fi
+	make -e NAME=$(SNAME) Delete
+	cd bdir/$(SNAME)
+	tar xvfz dump.tgz --exclude='./$(SNAME)_vm.xml' -C /
+	virsh define $(SNAME)_vm.xml
+	virsh start $(SNAME)
+
 ## create a live backup of the disks configured on the node
 ## they are placed parallel to the source file, with a timestamp suffix
 live-backup:
