@@ -44,8 +44,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-DISTRO := resolute
-#DISTRO := noble
+#DISTRO := resolute
+DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin
@@ -116,10 +116,10 @@ ROOTSIZE := 64
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 32768
+RAM := 16384
 
 ## guest node cpu coount
-VCPUS := 8
+VCPUS := 6
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
