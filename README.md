@@ -4,6 +4,7 @@
 
 ## Features
 
+- **Secured Accounts**: new group created to match FQDN and user-accounts must be member to ssh in.
 - **Automated Provisioning**: Uses `virt-install` and `cloud-init` for "boot-and-go" VM creation.
 - **Role-Based Configuration**: Tailors VMs (packages, boot commands, mounts, etc.) based on a defined `ROLE` (e.g., `docker`, `jenkins`, `gluster`).
 - **Disk Management**: Automatically creates and attaches root, swap, data, database, and web document root disks.
