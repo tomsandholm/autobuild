@@ -4,7 +4,7 @@
 
 ## Features
 
-- **Secured Accounts**: new group created to match FQDN and user-accounts must be member to ssh in.
+- **Secured Accounts**: new group created to match FQDN and user-accounts must be member to ssh in.[^1]
 - **Automated Provisioning**: Uses `virt-install` and `cloud-init` for "boot-and-go" VM creation.
 - **Role-Based Configuration**: Tailors VMs (packages, boot commands, mounts, etc.) based on a defined `ROLE` (e.g., `docker`, `jenkins`, `gluster`).
 - **Disk Management**: Automatically creates and attaches root, swap, data, database, and web document root disks.
@@ -12,6 +12,8 @@
 - **Ansible Integration**: Automatically registers new nodes in an Ansible inventory and triggers SSH key resets.
 - **Snapshots**: Automatically creates a "fresh" snapshot after the initial installation.
 - **Proxy Support**: Optional proxy configuration for APT and cloud-init.
+
+[^1]: I did this as AD user accounts offers unrestricted host login, this is a way to corral the users on a machine.
 
 ## Prerequisites
 
