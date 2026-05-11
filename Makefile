@@ -339,6 +339,7 @@ $(IMGDIR)/$(SNAME)/meta-data:
 	echo "instance-id: $(UUID)" > $(IMGDIR)/$(SNAME)/meta-data
 	echo "role: $(ROLE)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "aenv: $(ENV)" >> $(IMGDIR)/$(SNAME)/meta-data
+	echo "sname: $(SNAME)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "local-hostname: $(NAME)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "public-keys: " >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "- `cat $(HOME)/.ssh/id_rsa.pub`" >> $(IMGDIR)/$(SNAME)/meta-data

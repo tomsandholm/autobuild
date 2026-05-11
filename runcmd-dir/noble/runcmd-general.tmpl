@@ -1,8 +1,15 @@
 runcmd:
   - echo '{{ ds.meta_data.role }}' > /etc/role
   - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
+  - echo '{{ ds.meta_data.sname }}' > /etc/sname
   - update-grub
   - apt autoremove -y
+  - addgroup '{{ ds.meta_data.sname }}'
+  - usermod -aG '{{ ds.meta_data.sname }}' root
+  - usermod -aG '{{ ds.meta_data.sname }}' jenkins
+  - usermod -aG '{{ ds.meta_data.sname }}' sandholm
+  - usermod -aG '{{ ds.meta_data.sname }}' ansible
+  - echo "AllowGroups {{ ds.meta_data.sname }} sudo" >> /etc/ssh/sshd_config
   - touch /etc/cloud/cloud-init.disabled
   - eject
   - shutdown -h now
