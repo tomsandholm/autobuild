@@ -89,6 +89,9 @@ IPADDRESS := $(shell getent hosts $(SNAME)|awk '{print $$1}')
 ## what role to give node, populates /etc/role
 ROLE := general
 
+## what new groupname to create
+GRPNAME := $(shell echo $(NAME) | tr '.' '-')
+
 ## what env to give node, populates /etc/aenv
 ENV := dev
 
@@ -339,7 +342,7 @@ $(IMGDIR)/$(SNAME)/meta-data:
 	echo "instance-id: $(UUID)" > $(IMGDIR)/$(SNAME)/meta-data
 	echo "role: $(ROLE)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "aenv: $(ENV)" >> $(IMGDIR)/$(SNAME)/meta-data
-	echo "sname: $(SNAME)" >> $(IMGDIR)/$(SNAME)/meta-data
+	echo "grpname: $(GRPNAME)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "local-hostname: $(NAME)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "public-keys: " >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "- `cat $(HOME)/.ssh/id_rsa.pub`" >> $(IMGDIR)/$(SNAME)/meta-data
