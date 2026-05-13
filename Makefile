@@ -381,7 +381,7 @@ backup:
 	virsh shutdown $(SNAME)
 	sleep 5
 	@echo ">>>>> extract 'source file' lines"
-	get-src-file $(SNAME)_vm.xml > files-all
+	../../bin/get-src-file $(SNAME)_vm.xml > files-all
 	cat ./files-all | sed '/base/d' > files
 	echo "./$(SNAME)_vm.xml" >> files
 	tar cvfz dump.tgz -T ./files
