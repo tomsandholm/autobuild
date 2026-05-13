@@ -4,7 +4,7 @@ runcmd:
   - echo '{{ ds.meta_data.grpname }}' > /etc/grpname
   - update-grub
   - apt autoremove -y
-  - addgroup '{{ ds.meta_data.grpname }}'
+  - groupadd {{ ds.meta_data.grpname }}
   - usermod -aG '{{ ds.meta_data.grpname }}' root
   - usermod -aG '{{ ds.meta_data.grpname }}' jenkins
   - usermod -aG '{{ ds.meta_data.grpname }}' sandholm

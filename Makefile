@@ -1,4 +1,4 @@
-##MAKEFLAGS += --silent
+#MAKEFLAGS += --silent
 SHELL := /bin/bash
 .ONESHELL:
 
@@ -252,7 +252,7 @@ ifeq ($(PROXY),none)
 	cp user-data.tmp2 user-data.tmp1
 	sed "/APT/r ./apt-dir/$(DISTRO)/apt-$(ROLE).tmpl" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data.tmp1
-	sed "/SSHKEY/r ~/.ssh/id_rsa.pub" user-data.tmp1 > user-data.tmp2
+	sed "/SSHKEYS/r ./pubkeys/keys" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data
 else
 	cp user-data-dir/$(DISTRO)/user-data-proxy.tmpl user-data.tmp1
@@ -266,7 +266,7 @@ else
 	cp user-data.tmp2 user-data.tmp1
 	sed "/APT/r ./apt-dir/$(DISTRO)/apt-$(ROLE)-proxy.tmpl" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data.tmp1
-	sed "/SSHKEY/r ~/.ssh/id_rsa.pub" user-data.tmp1 > user-data.tmp2
+	sed "/SSHKEYS/r ./pubkeys/keys" user-data.tmp1 > user-data.tmp2
 	cp user-data.tmp2 user-data
 endif
 
