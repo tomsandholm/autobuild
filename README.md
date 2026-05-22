@@ -57,6 +57,16 @@
 
 ## Usage
 
+### GUI Interface (Recommended)
+
+For a user-friendly experience, you can use the standalone Qt GUI. It supports authentication, real-time command output, and automatic logging.
+
+```bash
+make gui
+```
+
+See [GUI_README.md](GUI_README.md) for more details.
+
 ### Creating a Node
 
 To create a new VM, provide the FQDN and optionally the role:

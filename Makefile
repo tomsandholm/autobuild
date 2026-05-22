@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .ONESHELL:
 
-.PHONEY:	help backup
+.PHONEY:	help backup web-ui-server
 
 PRIMARY := ''
 NLIST := ''
@@ -188,6 +188,22 @@ stats:
 	$(info ENV:.......$(ENV))
 	$(info ROLE:......$(ROLE))
 	$(info dirs:......$(dirs))
+
+.PHONEY: web-ui-server
+
+## start the web interface
+web-ui-server:
+	@if [ ! -d "web-ui/node_modules" ]; then \
+		echo "Installing web-ui dependencies..."; \
+		cd web-ui && npm install; \
+	fi
+	@echo "Starting web-ui on http://localhost:3000..."
+	#cd web-ui && npm start
+	cd web-ui && pm2 start npm --name "autobuild" -- start
+
+## start the standalone qt gui tool
+gui:
+	./autobuild_gui.py
 
 ## destructive!
 clean:
