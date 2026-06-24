@@ -100,9 +100,10 @@ ENV := dev
 SWAPSIZE := 8
 
 ## datadisk size
+## use this as /home
 ## in GB
 #DATASIZE := 16
-DATASIZE := 16
+DATASIZE := 32
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -112,7 +113,7 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 64
+ROOTSIZE := 16
 
 ## docroot disk size
 ## in GB

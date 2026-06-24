@@ -25,6 +25,22 @@ write_files:
     permissions: '0600'
     owner: root
 
+  - path: /root/ds-setup.inf
+    content: |
+      [General]
+      config_version = 2
+
+      [slapd]
+      instance_name = dirsrv
+      root_dn = cn=Directory Manager
+      root_password = theresa1
+      server_port = 389
+      server_identifier = dirsrv
+
+      [backend]
+      suffix = dc=tsand,dc=org
+
+      
 #MOUNTS
 
 #PACKAGES
