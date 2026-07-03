@@ -2,11 +2,9 @@
 SHELL := /bin/bash
 .ONESHELL:
 
-.PHONY:	help backup web-ui-server
-
-PRIMARY := ''
-NLIST := ''
-SUB := 'general'
+.PHONY:	help list targets stats web-ui-server gui clean clean-image sources base \
+	image role disks rootfs swap data dblog db web network-config meta-data \
+	Delete backup restore live-backup node snapshot librebooking
 
 check_defined = \
   $(strip $(foreach 1,$1, \
@@ -23,7 +21,6 @@ help:
 	echo "     RAM: (MB)"
 	echo "     VCPUS: (COUNT)"
 	echo "     NAME:  fqdn (REQUIRED)"
-	echo "     NAME:  fqdn (REQUIRED)"
 	echo ""
 	echo ">>> Targets"
 	make targets
@@ -32,12 +29,11 @@ help:
 	make list
 
 list:
-	$(shell mkdir -p $(IMGDIR))
+	mkdir -p $(IMGDIR)
 	ls $(IMGDIR)
 
-	
 targets:
-	sed -n 's/^\([a-zA-Z]*\):.*/\1/gp' Makefile
+	sed -n 's/^\([a-zA-Z][a-zA-Z-]*\):.*/\1/gp' Makefile
 
 ARCH := x86_64
 #ARCH := aarch64
@@ -190,8 +186,6 @@ stats:
 	$(info ROLE:......$(ROLE))
 	$(info dirs:......$(dirs))
 
-.PHONY: web-ui-server
-
 ## start the web interface
 web-ui-server:
 	@if [ ! -d "web-ui/node_modules" ]; then \
@@ -244,10 +238,8 @@ $(IMGDIR)/$(SNAME): $(IMGDIR)/$(SNAME)/rootfs.qcow2
 ## create a node root disk
 $(IMGDIR)/$(SNAME)/rootfs.qcow2:
 	mkdir -p $(IMGDIR)/$(SNAME)
-ifeq ($(ROOTSIZE),0)
 	qemu-img create -f qcow2 -F qcow2 -b $(BASEDIR)/$(DISTRO)/rootfs.qcow2 $(IMGDIR)/$(SNAME)/rootfs.qcow2
-else
-	qemu-img create -f qcow2 -F qcow2 -b $(BASEDIR)/$(DISTRO)/rootfs.qcow2 $(IMGDIR)/$(SNAME)/rootfs.qcow2
+ifneq ($(ROOTSIZE),0)
 	qemu-img resize $(IMGDIR)/$(SNAME)/rootfs.qcow2 $(ROOTSIZE)G
 endif
 	qemu-img info $(IMGDIR)/$(SNAME)/rootfs.qcow2
@@ -414,7 +406,7 @@ restore:
 	@echo ">>>>> restoring node $(SNAME) from bdir/$(SNAME)"
 	@if [ ! -d bdir/$(SNAME) ]; then echo "Backup directory bdir/$(SNAME) does not exist"; exit 1; fi
 	@if [ ! -f bdir/$(SNAME)/dump.tgz ]; then echo "Backup file bdir/$(SNAME)/dump.tgz does not exist"; exit 1; fi
-	make -e NAME=$(SNAME) Delete
+	make -e NAME=$(NAME) Delete
 	cd bdir/$(SNAME)
 	tar xvfz dump.tgz --exclude='./$(SNAME)_vm.xml' -C /
 	virsh define $(SNAME)_vm.xml
@@ -437,7 +429,7 @@ node:	role disks network-config
 		--ram $(RAM) \
 		--vcpus=$(VCPUS) \
 		--disk path=$(IMGDIR)/$(SNAME)/rootfs.qcow2,device=disk,bus=virtio \
-		--os-variant=ubuntu22.04 \
+		--os-variant=$(OS-VARIANT) \
 		$(SWAPDISK) \
 		$(DATADISK) \
 		$(WEBDISK) \
@@ -446,7 +438,7 @@ node:	role disks network-config
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 ifeq ($(ANSIBLE),true) 
 	echo "##### registering with Ansible server"
-	sudo echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" >> /etc/ansible/hosts
+	echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
