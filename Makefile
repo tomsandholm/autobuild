@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .ONESHELL:
 
-.PHONEY:	help backup web-ui-server
+.PHONY:	help backup web-ui-server
 
 PRIMARY := ''
 NLIST := ''
@@ -190,7 +190,7 @@ stats:
 	$(info ROLE:......$(ROLE))
 	$(info dirs:......$(dirs))
 
-.PHONEY: web-ui-server
+.PHONY: web-ui-server
 
 ## start the web interface
 web-ui-server:
