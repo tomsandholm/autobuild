@@ -37,7 +37,7 @@ list:
 
 	
 targets:
-	sed -n 's/^\([a-Z][a-Z-]*\):.*/\1/gp' Makefile
+	sed -n 's/^\([a-zA-Z]*\):.*/\1/gp' Makefile
 
 ARCH := x86_64
 #ARCH := aarch64
