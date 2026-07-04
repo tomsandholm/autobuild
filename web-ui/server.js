@@ -8,12 +8,15 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.post('/api/node', (req, res) => {
-    const { fqdn, role } = req.body;
+    const { fqdn, role, ram, ncpu } = req.body;
     if (!fqdn || !role) {
         return res.status(400).json({ error: 'FQDN and ROLE are required' });
     }
 
-    const command = `make node NAME=${fqdn} ROLE=${role}`;
+    let command = `make node NAME=${fqdn} ROLE=${role}`;
+    if (ram) command += ` RAM=${ram}`;
+    if (ncpu) command += ` NCPU=${ncpu}`;
+    
     console.log(`Executing: ${command}`);
 
     exec(command, { cwd: path.join(__dirname, '..') }, (error, stdout, stderr) => {

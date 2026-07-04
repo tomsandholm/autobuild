@@ -1,5 +1,7 @@
 const fqdnInput = document.getElementById('fqdn');
 const roleSelect = document.getElementById('role');
+const ramInput = document.getElementById('ram');
+const ncpuInput = document.getElementById('ncpu');
 const nodeBtn = document.getElementById('nodeBtn');
 const deleteBtn = document.getElementById('deleteBtn');
 const statusDiv = document.getElementById('status');
@@ -59,11 +61,14 @@ async function handleAction(endpoint, body) {
 nodeBtn.addEventListener('click', () => {
     const fqdn = fqdnInput.value.trim();
     const role = roleSelect.value;
+    const ram = ramInput.value.trim();
+    const ncpu = ncpuInput.value.trim();
+    
     if (!fqdn) {
         setStatus('Please enter an FQDN', 'error');
         return;
     }
-    handleAction('/api/node', { fqdn, role });
+    handleAction('/api/node', { fqdn, role, ram, ncpu });
 });
 
 deleteBtn.addEventListener('click', () => {
