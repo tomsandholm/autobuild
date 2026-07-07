@@ -2,6 +2,8 @@
 
 `autobuild` is a Makefile-driven toolkit designed to automate the creation and deployment of Ubuntu KVM virtual machines on a libvirt host. It streamlines the process of downloading cloud images, configuring disks, assembling cloud-init metadata, and provisioning VMs with specific roles. NOTICE that you must switch to branch 'wsl' from main if you are installing under wsl2.
 
+https://github.com/tomsandholm/autobuild/blob/main/presentation/autobuild-presentation-1.pdf
+
 ## Features
 
 - **Secured Accounts**: new group created to match FQDN and user-accounts must be member to ssh in.[^1]
