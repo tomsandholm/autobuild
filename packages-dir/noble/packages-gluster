@@ -10,4 +10,3 @@ packages:
   - ntpsec
   - glusterfs-server
   - glusterfs-client
-  - ansible
