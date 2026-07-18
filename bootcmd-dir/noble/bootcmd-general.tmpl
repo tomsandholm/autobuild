@@ -3,6 +3,6 @@ bootcmd:
  - swapon /dev/vdb
  - pvcreate /dev/vdc
  - vgcreate vg_system /dev/vdc
- - lvcreate -l 100%FREE -n vg_home vg_system
+ - lvcreate --name vg_home -l 100%FREE vg_system
  - mkfs.xfs /dev/vg_system/vg_home
 
