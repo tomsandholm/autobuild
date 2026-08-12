@@ -1,0 +1,37 @@
+#!/bin/bash
+
+INVENTORY_FILE="/etc/ansible/hosts"
+TARGET_GROUP="virt"
+NEW_HOST="${1?Must declare host}"
+
+# Check if host already exists in the file to prevent duplicates
+if grep -qxF "$NEW_HOST" "$INVENTORY_FILE"; then
+    echo "Host $NEW_HOST already exists in inventory."
+    exit 0
+fi
+
+# Use awk to insert the new host under the correct section header
+awk -v group="[$TARGET_GROUP]" -v host="$NEW_HOST" '
+    $0 == group {
+        print
+        print host
+        printed = 1
+        next
+    }
+    /^\[.*\]/ {
+        if (found_group && !printed) {
+            print host
+            printed = 1
+        }
+        found_group = ($0 == group)
+    }
+    { print }
+    END {
+        if (found_group && !printed) {
+            print host
+        }
+    }
+' "$INVENTORY_FILE" > "${INVENTORY_FILE}.tmp" && mv "${INVENTORY_FILE}.tmp" "$INVENTORY_FILE"
+
+echo "Added $NEW_HOST to [$TARGET_GROUP] in $INVENTORY_FILE."
+

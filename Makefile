@@ -40,8 +40,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-#DISTRO := resolute
-DISTRO := noble
+DISTRO := resolute
+#DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin
@@ -99,7 +99,7 @@ SWAPSIZE := 8
 ## use this as /home
 ## in GB
 #DATASIZE := 16
-DATASIZE := 32
+DATASIZE := 16
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -109,17 +109,17 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 16
+ROOTSIZE := 8
 
 ## docroot disk size
 ## in GB
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 16384
+RAM := 8192
 
 ## guest node cpu coount
-VCPUS := 6
+VCPUS := 2
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
@@ -438,7 +438,8 @@ node:	role disks network-config
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 ifeq ($(ANSIBLE),true) 
 	echo "##### registering with Ansible server"
-	echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
+	./update-ansible $(NAME)
+	#echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
 	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
