@@ -1,0 +1,7 @@
+#! /usr/bin/bash
+# vi:set nu ai ap aw smd showmatch tabstop=4 shiftwidth=4:
+
+
+                                               
+ssh -o StrictHostKeyChecking=accept-new ha1.tsand.org sudo gluster \
+	volume start vol_disk 
