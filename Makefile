@@ -40,8 +40,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-DISTRO := resolute
-#DISTRO := noble
+#DISTRO := resolute
+DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin
@@ -55,13 +55,13 @@ DISTRO := resolute
 # this will use the apt-dir/(DISTRO)/apt-(ROLE)-proxy.tmpl and
 # user-data-dir/(DISTRO)/user-data-proxy.tmpl
 # if set true, otherwise the same tmpl files without -proxy
-PROXY := true
-#PROXY := none
+#PROXY := true
+PROXY := none
 
 # whether to register with ansible server
 # this will enable or disable the ansible registration.
-ANSIBLE := true
-#ANSIBLE := false
+#ANSIBLE := true
+ANSIBLE := false
 
 
 ## graphics
@@ -96,10 +96,10 @@ ENV := dev
 SWAPSIZE := 8
 
 ## datadisk size
-## use this as /home
+## use this as /var/lib/docker
 ## in GB
 #DATASIZE := 16
-DATASIZE := 16
+DATASIZE := 128
 
 ## DBLOGSIZE
 DBLOGSIZE := 0
@@ -109,17 +109,17 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 8
+ROOTSIZE := 128
 
 ## docroot disk size
 ## in GB
 WEBSIZE := 0
 
 ## guest node ram size
-RAM := 8192
+RAM := 32768
 
 ## guest node cpu coount
-VCPUS := 2
+VCPUS := 4
 
 ## guest node os type
 OS-VARIANT := ubuntu22.04
@@ -129,10 +129,10 @@ OS-VARIANT := ubuntu22.04
 ETCDIR := /etc/kvmbld
 
 ## where we store virtual nodes stuff 
-VARDIR := /var/lib/kvmbld
+VARDIR := /var/lib/libvirt
 
 ## where we store extra data
-DATADIR := /data/virt
+DATADIR := /var/lib/libvirt/virt
 
 ## base images directory, used as backing store for qcow2 images
 BASEDIR := $(VARDIR)/base
@@ -375,10 +375,10 @@ Delete:
 	@echo "##### removing $(IMGDIR)/$(SNAME) #####"
 	rm -rf $(IMGDIR)/$(SNAME)
 	rm -rf $(DATADIR)/$(SNAME)
-	sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
-	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
-	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
-	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+	#sudo sed -i "/^$(NAME).*/d" /etc/ansible/hosts
+	#scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 	make -e NAME=$(NAME) clean-image
 
 ## backup a node
@@ -435,19 +435,23 @@ node:	role disks network-config
 		$(WEBDISK) \
 		--graphics $(GRAPHICS) \
 		--import \
+		--wait -1 \
+		--noreboot \
+		--noautoconsole \
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 ifeq ($(ANSIBLE),true) 
-	echo "##### registering with Ansible server"
-	./update-ansible $(NAME)
+	#echo "##### registering with Ansible server"
+	#./update-ansible $(NAME)
 	#echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
-	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
-	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
-	ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
+	#scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
+	#ssh ansible@ansible /home/ansible/bin/sshreset $(NAME)
 else
 	echo "##### skipping registration with Ansible server"
 endif
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
+	echo "##### installation is complete and snapshot created"
 
 snapshot:
 	@:$(call check_defined,NAME)
@@ -455,9 +459,3 @@ snapshot:
 	virsh snapshot-create-as --domain $(SNAME) "auto-snap" --description "makefile snapshot" --diskspec vda,snapshot=internal
 	virsh start $(SNAME)
 
-librebooking:
-	@:$(call check_defined,NAME)
-	ssh ansible@ansible "cd ansible/playbooks; \
-	ansible-playbook --limit $(NAME) librebooking-mysql.yml; \
-	ansible-playbook --limit $(NAME) librebooking-apache2.yml; \
-	ansible-playbook --limit $(NAME) librebooking-php.yml;"
