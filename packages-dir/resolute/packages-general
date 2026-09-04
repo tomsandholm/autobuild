@@ -9,3 +9,5 @@ packages:
   - zip
   - net-tools
   - ntpsec
+  - cockpit
+  - python3-software-properties
