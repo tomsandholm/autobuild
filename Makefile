@@ -40,8 +40,8 @@ ARCH := x86_64
 
 DOMAIN := .tsand.org
 ## the distro to build
-DISTRO := resolute
-#DISTRO := noble
+#DISTRO := resolute
+DISTRO := noble
 #DISTRO := focal
 #DISTRO := jammy
 #DISTRO := noblemin
@@ -109,7 +109,7 @@ DBSIZE := 0
 
 ## rootdisk size
 ## in GB
-ROOTSIZE := 8
+ROOTSIZE := 16
 
 ## docroot disk size
 ## in GB
@@ -119,20 +119,22 @@ WEBSIZE := 0
 RAM := 8192
 
 ## guest node cpu coount
-VCPUS := 2
+VCPUS := 4
 
 ## guest node os type
-OS-VARIANT := ubuntu22.04
+OS-VARIANT := ubuntu25.04
 #OS-VARIANT := ubuntu20.04
 
 ## where the etc directoy lives
 ETCDIR := /etc/kvmbld
 
 ## where we store virtual nodes stuff 
-VARDIR := /var/lib/kvmbld
+#VARDIR := /var/lib/kvmbld
+VARDIR := /var/lib/libvirt
 
 ## where we store extra data
-DATADIR := /data/virt
+#DATADIR := /data/virt
+DATADIR := /var/lib/libvirt/data
 
 ## base images directory, used as backing store for qcow2 images
 BASEDIR := $(VARDIR)/base
