@@ -4,16 +4,16 @@ autoinstall:
 disable_root: 0
 ssh_pwauth: 1
 
-proxy: http://10.0.0.193:3128
-http_proxy: http://10.0.0.193:3128
-ftp_proxy: http://10.0.0.193:3128
-https_proxy: http://10.0.0.193:3128
+proxy: http://10.0.0.193:3142
+http_proxy: http://10.0.0.193:3142
+ftp_proxy: http://10.0.0.193:3142
+https_proxy: http://10.0.0.193:3142
 
 write_files:
   - path: /etc/environment
     content: |
-      HTTP_PROXY="http://10.0.0.193:3128"
-      HTTPS_PROXY="http://10.0.0.193:3128"
+      HTTP_PROXY="http://10.0.0.193:3142"
+      HTTPS_PROXY="http://10.0.0.193:3142"
       NO_PROXY="localhost,127.0.0.1"
     owner: root:root
     permissions: '0644'
@@ -21,7 +21,7 @@ write_files:
   - path: /root/.gitconfig
     content: |
       [http]
-        proxy = http://10.0.0.193:3128
+        proxy = http://10.0.0.193:3142
     permissions: '0600'
     owner: root
 
