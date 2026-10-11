@@ -1,6 +1,7 @@
 # packages-docker
 packages:
   - apt-transport-https
+  - systemd-timesyncd
   - ca-certificates
   - curl 
   - software-properties-common
