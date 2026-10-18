@@ -1,0 +1,10 @@
+runcmd:
+  - echo '{{ ds.meta_data.role }}' > /etc/role
+  - echo '{{ ds.meta_data.aenv }}' > /etc/aenv
+  - update-grub
+  - systemctl enable --now systemd-timesyncd.service
+  - apt autoremove -y
+  - touch /etc/cloud/cloud-init.disabled
+  - usermod -aG kvm,libvirt sandholm
+  - eject
+  - shutdown -h now

@@ -1,12 +1,3 @@
 # packages-general
 packages:
-  - apt-transport-https
-  - python3
-  - lsof
-  - network-manager
-  - netcat
-  - haveged
-  - zip
-  - net-tools
   - ntpsec
-  - nfs-kernel-server

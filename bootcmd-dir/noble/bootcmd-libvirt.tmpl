@@ -1,0 +1,11 @@
+bootcmd:
+ - mkswap /dev/vdb
+ - swapon /dev/vdb
+ - pvcreate /dev/vdc
+ - vgcreate vglibvirt /dev/vdc
+ - lvcreate --name lvlibvirt -l 100%FREE vglibvirt
+ - mkfs.xfs /dev/vglibvirt/lvlibvirt
+ - apt-get install -y gh
+ - apt-get update
+ - mkdir -p /share/home
+
