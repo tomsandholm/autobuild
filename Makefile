@@ -1,10 +1,12 @@
 #MAKEFLAGS += --silent
 SHELL := /bin/bash
+GRP_FILE := machine-group-number.txt
+MAC_GRP := machine-group.txt
 .ONESHELL:
 
 .PHONY:	help list targets stats web-ui-server gui clean clean-image sources base \
 	image role disks rootfs swap data dblog db web network-config meta-data \
-	Delete backup restore live-backup node snapshot librebooking
+	Delete backup restore live-backup node snapshot librebooking increment-group-number
 
 check_defined = \
   $(strip $(foreach 1,$1, \
@@ -12,6 +14,15 @@ check_defined = \
 __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
+
+# read current group number, default to 5000 if not found.
+ifneq ($(wildcard $(GRP_FILE)),)
+    GRP_NUM := $(shell cat $(GRP_FILE))
+else
+    GRP_NUM := 5000
+endif
+
+
 
 help:
 	echo ">>> key variables are:"
@@ -31,6 +42,8 @@ help:
 list:
 	mkdir -p $(IMGDIR)
 	ls $(IMGDIR)
+
+
 
 targets:
 	sed -n 's/^\([a-zA-Z][a-zA-Z-]*\):.*/\1/gp' Makefile
@@ -129,12 +142,12 @@ OS-VARIANT := ubuntu25.04
 ETCDIR := /etc/kvmbld
 
 ## where we store virtual nodes stuff 
-#VARDIR := /var/lib/kvmbld
-VARDIR := /var/lib/libvirt
+VARDIR := /var/lib/kvmbld
+#VARDIR := /var/lib/libvirt
 
 ## where we store extra data
-#DATADIR := /data/virt
-DATADIR := /var/lib/libvirt/data
+DATADIR := /data/virt
+#DATADIR := /var/lib/libvirt/data
 
 ## base images directory, used as backing store for qcow2 images
 BASEDIR := $(VARDIR)/base
@@ -346,6 +359,14 @@ ifeq ($(NET),dhcp)
 	cp network-config/$(DISTRO)/network-config-dhcp.tmpl $(IMGDIR)/$(SNAME)/network-config
 endif
 
+# check that group-number file exists, create it if not, set to 5000
+# record current machine-group-name and number into local file
+increment-group-number:
+	@if [ ! -f $(GRP_FILE_) ]; then echo 5000 > $(GRP_FILE); fi
+	@echo "$(GRPNAME) $(GRP_NUM)" >> $(MAC_GRP)
+	@echo $$(($$(cat $(GRP_FILE)) + 1)) > $(GRP_FILE)
+
+
 ## create the cloud-init meta-data
 meta-data:	$(IMGDIR)/$(SNAME)/meta-data
 
@@ -354,6 +375,7 @@ $(IMGDIR)/$(SNAME)/meta-data:
 	echo "role: $(ROLE)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "aenv: $(ENV)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "grpname: $(GRPNAME)" >> $(IMGDIR)/$(SNAME)/meta-data
+	echo "grpnumber: $(GRP_NUM)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "local-hostname: $(NAME)" >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "public-keys: " >> $(IMGDIR)/$(SNAME)/meta-data
 	echo "- `cat $(HOME)/.ssh/id_rsa.pub`" >> $(IMGDIR)/$(SNAME)/meta-data
@@ -441,6 +463,7 @@ node:	role disks network-config
 ifeq ($(ANSIBLE),true) 
 	echo "##### registering with Ansible server"
 	sudo ./update-ansible $(NAME)
+	sudo ./update-dsh $(NAME)
 	#echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
@@ -450,6 +473,8 @@ else
 endif
 	virsh start $(SNAME)
 	virsh snapshot-create-as --domain $(SNAME) --name "fresh" --description "initial install image snapshot running"
+	make increment-group-number
+	scp ./machine-group.txt ansible:~/
 
 snapshot:
 	@:$(call check_defined,NAME)
