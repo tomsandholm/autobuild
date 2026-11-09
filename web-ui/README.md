@@ -1,50 +1,67 @@
 # Autobuild Web UI
 
-A web interface for automating node deployments via an underlying Makefile.
+Browser front end for **`make node`** and **`make Delete`**. The Express server runs from `web-ui/` but executes Make in the **parent directory** (repo root).
 
 ## Features
 
-- **Web Interface**: Modern, responsive web UI for creating and deleting nodes.
-- **Makefile Integration**: Directly executes `make` commands to manage infrastructure.
+- Create/delete VMs by FQDN and role
+- Optional RAM override (see caveat below)
+- JSON API + static SPA under `public/`
 
-## Project Structure
+## Structure
 
 ```text
-/
-├── server.js          # Node.js Express server (Web Backend)
-├── package.json       # Node.js dependencies and scripts
-├── public/            # Web Frontend assets
-│   ├── index.html     # Web UI structure
-│   ├── script.js      # Web UI logic
-│   └── style.css      # Web UI styling
-└── README.md          # Project documentation
+web-ui/
+├── server.js       # Express API
+├── package.json
+└── public/
+    ├── index.html
+    ├── script.js
+    └── style.css
 ```
 
 ## Prerequisites
 
-- **Node.js**: Required for the Web Interface.
-- **Make**: The project expects a `Makefile` in the parent directory (or at `/home/sandholm/prog/autobuild/Makefile`).
+- **Node.js** and npm
+- **Make**, **libvirt**, and full autobuild host setup ([README.md](../README.md))
+- **`make web-ui-server`** additionally expects **pm2** globally (`npm install -g pm2`)
 
-## Getting Started
+## Quick start
 
-### Web Interface
+From the **autobuild repo root**:
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+make web-ui-server
+```
 
-2. **Start the Server**:
-   ```bash
-   npm start
-   ```
+This installs `node_modules` if missing and runs `pm2 start npm --name "autobuild" -- start` in `web-ui/`.
 
-3. **Access the UI**:
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+Manual run (no pm2):
 
-## How It Works
+```bash
+cd web-ui
+npm install
+npm start
+```
 
-### Web Interface
-The web interface communicates with `server.js` via API endpoints:
-- `POST /api/node`: Executes `make node NAME={fqdn} ROLE={role}`.
-- `POST /api/delete`: Executes `make Delete NAME={fqdn}`.
+Open [http://localhost:3000](http://localhost:3000).
+
+## API
+
+| Method | Path | Body | Make equivalent |
+|--------|------|------|-----------------|
+| `POST` | `/api/node` | `{ "fqdn", "role", "ram?", "ncpu?" }` | `make node NAME=… ROLE=…` (+ optional `RAM=`) |
+| `POST` | `/api/delete` | `{ "fqdn" }` | `make Delete NAME=…` |
+
+### RAM and vCPUs
+
+- **`ram`** in the JSON body is passed through as `RAM=…` and works.
+- The UI field **NCPU** is sent as `NCPU=…`, but the Makefile variable is **`VCPUS`**, so vCPU overrides from the web UI are **ignored** until `server.js` maps `ncpu` → `VCPUS`.
+
+### Roles
+
+The HTML `<select>` matches the Qt GUI list. Additional roles (e.g. **`libvirt`**) work via CLI or API with a custom `role` value if fragments exist for your `DISTRO`. See [docs/ROLES.md](../docs/ROLES.md).
+
+## Security
+
+The server runs **`make`** with user-supplied FQDN/role and is intended for **trusted local admin use** on the hypervisor, not public exposure without authentication and hardening.

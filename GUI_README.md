@@ -1,45 +1,52 @@
 # Autobuild Manager GUI
 
-The Autobuild Manager GUI is a standalone desktop application built with Python and PyQt5. it provides a user-friendly interface for managing virtual nodes via the project's `Makefile`.
+Standalone **PyQt5** desktop app (`autobuild_gui.py`) that runs `make node` and `make Delete` from the project root.
 
 ## Features
 
-- **Authentication**: Secure login required to access the manager.
-- **Node Creation**: Specify an FQDN and select a role to create a new virtual node.
-- **Node Deletion**: Quickly delete existing nodes with a confirmation prompt.
-- **Real-time Console**: View live output from `make` commands directly in the application.
-- **Automatic Logging**: All command outputs are automatically saved to the `logs/` directory with timestamps.
+- **Authentication**: login gate before operations.
+- **Node creation**: FQDN + role → `make node NAME=… ROLE=…`.
+- **Node deletion**: confirmation before `make Delete`.
+- **Console**: live stdout/stderr from Make.
+- **Logging**: timestamped files under `logs/` (`autobuild_YYYYMMDD_HHMMSS.log`).
 
 ## Prerequisites
 
 - Python 3
-- PyQt5 (`pip install PyQt5`)
+- PyQt5: `pip install PyQt5`
+- Same host prerequisites as [README.md](README.md) (libvirt, Makefile paths, `pubkeys/keys`, etc.)
 
 ## Usage
 
-To start the GUI, run the following command from the project root:
-
 ```bash
 make gui
+# or
+./autobuild_gui.py
 ```
 
 ### Authentication
-On the first run, the application will create a `.auth.json` file in the project root with default credentials:
+
+On first run, creates `.auth.json` in the repo root (git-ignored) with defaults:
+
 - **Username**: `admin`
 - **Password**: `password`
 
-You can change these credentials by editing the `.auth.json` file. This file is excluded from git for security.
+Edit `.auth.json` to change credentials.
 
-### Creating a Node
-1. Enter the Full Qualified Domain Name (FQDN) in the text field (e.g., `webserver.example.com`).
-2. Select the desired role from the dropdown menu (e.g., `apache`, `docker`).
-3. Click **Create Node**. The output will appear in the console area below.
+### Roles in the dropdown
 
-### Deleting a Node
-1. Enter the FQDN of the node you wish to delete.
-2. Click **Delete Node**.
-3. Confirm the deletion in the popup dialog.
+`general`, `ansible`, `apache`, `docker`, `dockldap`, `gitlab`, `gitolite`, `gitserver`, `gluster`, `jenkins`, `qemu`
 
-## Logging
+Roles such as **`libvirt`** and **`389ds`** are CLI-only unless added to `autobuild_gui.py`. See [docs/ROLES.md](docs/ROLES.md).
 
-Every operation performed via the GUI is logged to a file in the `logs/` directory. Files are named using the format `autobuild_YYYYMMDD_HHMMSS.log`. These logs include the command executed, start/end times, and the full console output.
+### Create / delete
+
+1. Enter FQDN (e.g. `webserver.tsand.org`).
+2. Choose role (or use CLI for others).
+3. **Create Node** or **Delete Node** (confirm delete).
+
+RAM, disk sizes, and `DISTRO` use Makefile defaults; override from the shell if needed:
+
+```bash
+make -e NAME=webserver.tsand.org ROLE=apache RAM=4096 node
+```

@@ -1,115 +1,167 @@
 # Autobuild
 
-`autobuild` is a Makefile-driven toolkit designed to automate the creation and deployment of Ubuntu KVM virtual machines on a libvirt host. It streamlines the process of downloading cloud images, configuring disks, assembling cloud-init metadata, and provisioning VMs with specific roles. NOTICE that you must switch to branch 'wsl' from main if you are installing under wsl2.
+Makefile-driven automation for **Ubuntu KVM/libvirt** guests: download official cloud images, build **qcow2** disks (shared backing store + per-VM overlays), assemble **cloud-init** from role-specific fragments, and provision with **`virt-install --import`**. Optional **Ansible** inventory registration and post-install snapshots.
 
-https://github.com/tomsandholm/autobuild/blob/main/presentation/autobuild-presentation-1.pdf
+Presentation: [autobuild-presentation-1.pdf](presentation/autobuild-presentation-1.pdf)
+
+Deeper technical notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · Role matrix: [docs/ROLES.md](docs/ROLES.md)
 
 ## Features
 
-- **Secured Accounts**: new group created to match FQDN and user-accounts must be member to ssh in.[^1]
-- **Automated Provisioning**: Uses `virt-install` and `cloud-init` for "boot-and-go" VM creation.
-- **Role-Based Configuration**: Tailors VMs (packages, boot commands, mounts, etc.) based on a defined `ROLE` (e.g., `docker`, `jenkins`, `gluster`).
-- **Disk Management**: Automatically creates and attaches root, swap, data, database, and web document root disks.
-- **Network Flexibility**: Supports both static and DHCP network configurations via templates.
-- **Ansible Integration**: Automatically registers new nodes in an Ansible inventory and triggers SSH key resets.
-- **Snapshots**: Automatically creates a "fresh" snapshot after the initial installation.
-- **Proxy Support**: Optional proxy configuration for APT and cloud-init.
+- **Secured SSH access**: cloud-init creates a group derived from the VM FQDN; only listed user accounts in that group can log in.[^1]
+- **Role-based first boot**: `ROLE` selects package lists and `bootcmd` / `mounts` / `runcmd` / `apt` fragments per distro (e.g. `docker`, `jenkins`, `libvirt`).
+- **Disk layout**: root (overlay on a shared base image), optional swap, data, DB, dblog, and web docroot disks.
+- **Networking**: static (IP from `getent hosts <shortname>`) or DHCP templates under `network-config/`.
+- **Ansible**: appends the host under `[virt]` in `/etc/ansible/hosts`, syncs to `ansible@ansible`, runs `sshreset` (disable with `ANSIBLE=false`).
+- **Snapshots**: `fresh` snapshot after `make node`; additional snapshots via `make snapshot`.
+- **Proxy**: `PROXY=true` (default) uses proxy-specific apt/user-data templates; set `PROXY=none` to disable.
+- **UIs**: PyQt5 desktop GUI (`make gui`) and Node/Express web UI (`make web-ui-server`).
 
-[^1]: I did this as AD user accounts offers unrestricted host login, this is a way to corral the users on a machine.
+[^1]: Corrals users compared to unrestricted AD-backed host login.
+
+## WSL2 vs libvirt host
+
+Provisioning requires **KVM, libvirt, and `virt-install` on the hypervisor**, not inside WSL alone. For WSL-oriented workflow and paths, use the **`wsl` branch** when working from WSL2:
+
+```bash
+git checkout wsl   # when developing or syncing from WSL; use main on the libvirt host
+```
+
+Day-to-day builds and `make node` should run on the **Ubuntu/Kubuntu libvirt host** (bridge `br0`, `qemu:///system`).
 
 ## Prerequisites
 
-- **Host OS**: Ubuntu/Kubuntu (tested on 24.04).
-- **KVM/Libvirt**: Must be installed, configured, and enabled.
-- **Network Bridge**: A host bridge named `br0` is required.
-- **Permissions**: Full write access to:
-  - `/data` (or configured `DATADIR`)
-  - `/var/lib/kvmbld` (or configured `VARDIR`)
-- **DNS/Hosts**: For static IP setups, the FQDN must be resolvable (e.g., in `/etc/hosts`) so the Makefile can determine the IP address.
+| Requirement | Notes |
+|-------------|--------|
+| Host OS | Ubuntu/Kubuntu (tested with **noble** / 24.04+) |
+| KVM / libvirt | Installed, user in `libvirt` group; `virsh` / `virt-install` on `PATH` |
+| Bridge | **`br0`** attached to guest networking |
+| Storage | Writable **`VARDIR`** and **`DATADIR`** (see below) |
+| DNS / hosts | For **`NET=static`**, short hostname must resolve (`getent hosts <shortname>`) |
+| Ansible (optional) | Local `/etc/ansible/hosts`, SSH to `ansible@ansible` |
+| SSH key | `~/.ssh/id_rsa.pub` injected into meta-data |
+| `pubkeys/keys` | Referenced when assembling `user-data` (not in git; create locally) |
 
-## Directory Structure
+### Default storage paths (Makefile)
 
-| Directory | Description |
-| :--- | :--- |
-| `user-data-dir/` | Base `cloud-config` templates per distribution. |
-| `packages-dir/` | Lists of packages to install, organized by distribution and role. |
-| `bootcmd-dir/` | Role-specific boot command fragments. |
-| `mounts-dir/` | Role-specific mount configurations. |
-| `runcmd-dir/` | Role-specific run command fragments. |
-| `apt-dir/` | Role-specific APT configuration fragments. |
-| `network-config/` | Templates for static and DHCP network configurations. |
-| `tools/` | Supplemental scripts and tools. |
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `VARDIR` | `/var/lib/libvirt` | sources, base images, per-VM disks under `images/` |
+| `DATADIR` | `/var/lib/libvirt/data` | optional `/data`-style data disks |
+| `ETCDIR` | `/etc/kvmbld` | host-side metadata (if used) |
 
-## Key Makefile Variables
+Older docs referred to `/var/lib/kvmbld` and `/data/virt`; overrides are supported via `make -e VARDIR=... DATADIR=...`.
+
+## Repository layout
+
+| Path | Purpose |
+|------|---------|
+| `Makefile` | Targets, defaults, virt-install, Ansible hooks |
+| `distro` | Distro name → cloud image URL and filename |
+| `user-data-dir/` | Base cloud-config templates per release |
+| `packages-dir/`, `bootcmd-dir/`, `mounts-dir/`, `runcmd-dir/`, `apt-dir/` | Per-distro, per-`ROLE` fragments |
+| `network-config/` | Static and DHCP network templates |
+| `bin/`, `tools/` | Backup helpers, TLS tooling (`tools/Makefile`) |
+| `autobuild_gui.py`, `gui.py` | Qt management GUIs |
+| `web-ui/` | Browser UI (Express + static frontend) |
+| `update-ansible` | Insert FQDN into `[virt]` inventory |
+| Root `gluster-*`, `ha-*`, `clear-cluster` | Gluster / HA helper scripts (manual ops) |
+
+Root-level `user-data.yaml`, `network-config.yaml`, and `meta-data.yaml` are **examples**; the Makefile writes authoritative files under `$(IMGDIR)/$(SNAME)/`.
+
+## Key variables
 
 | Variable | Default | Description |
-| :--- | :--- | :--- |
-| `NAME` | (Required) | The FQDN of the VM. |
-| `DISTRO` | `noble` | The Ubuntu distribution (e.g., `focal`, `jammy`, `noble`). |
-| `ROLE` | `general` | The role of the VM (determines configuration fragments). |
-| `ENV` | `dev` | The environment tag (e.g., `dev`, `prod`). |
-| `RAM` | `4096` | RAM in MB. |
-| `VCPUS` | `4` | Number of virtual CPUs. |
-| `ROOTSIZE` | `32` | Root disk size in GB. |
-| `SWAPSIZE` | `8` | Swap disk size in GB. |
-| `DATASIZE` | `16` | Data disk size in GB. |
-| `NET` | `static` | Network type (`static` or `dhcp`). |
-| `PROXY` | `true` | Enable/disable proxy templates. |
-| `ANSIBLE` | `true` | Enable/disable Ansible registration. |
+|----------|---------|-------------|
+| `NAME` | *(required)* | VM FQDN (short name = libvirt domain) |
+| `DISTRO` | `noble` | Key from `distro` (`jammy`, `resolute`, `noblearm`, …) |
+| `ROLE` | `general` | Configuration profile; see [docs/ROLES.md](docs/ROLES.md) |
+| `ENV` | `dev` | Stored in meta-data as `aenv` |
+| `RAM` | `8192` | MiB |
+| `VCPUS` | `4` | vCPU count |
+| `ROOTSIZE` | `16` | Root disk GiB (0 = no resize) |
+| `SWAPSIZE` | `8` | Swap GiB (0 = no swap disk) |
+| `DATASIZE` | `16` | Data disk GiB (0 = skip) |
+| `DBSIZE`, `DBLOGSIZE`, `WEBSIZE` | `0` | Optional extra disks |
+| `NET` | `static` | `static` or `dhcp` |
+| `PROXY` | `true` | `true` or `none` |
+| `ANSIBLE` | `true` | `true` or `false` |
+| `OS-VARIANT` | `ubuntu25.04` | Passed to `virt-install` |
+
+Run `make stats NAME=host.example.com` to print resolved URLs, IP, and paths.
 
 ## Usage
 
-### GUI Interface (Recommended)
+### Command line
 
-For a user-friendly experience, you can use the standalone Qt GUI. It supports authentication, real-time command output, and automatic logging.
+```bash
+# Overview
+make help
+
+# Create a node (NAME required)
+make -e NAME=node01.tsand.org ROLE=docker node
+
+# Destroy VM, storage, pools, Ansible line, image dir
+make -e NAME=node01.tsand.org Delete
+
+# List image directories
+make list
+
+# Snapshot (Makefile target)
+make -e NAME=node01.tsand.org snapshot
+
+# Offline backup (shutdown, tar qcow2 + XML)
+make -e NAME=node01.tsand.org backup
+make -e NAME=node01.tsand.org restore
+
+# Live disk backup via libvirt
+make -e NAME=node01.tsand.org live-backup
+
+# LibreBooking playbooks on host (Ansible limit = FQDN)
+make -e NAME=node01.tsand.org librebooking
+```
+
+### Desktop GUI
 
 ```bash
 make gui
 ```
 
-See [GUI_README.md](GUI_README.md) for more details.
+See [GUI_README.md](GUI_README.md).
 
-### Creating a Node
-
-To create a new VM, provide the FQDN and optionally the role:
+### Web UI
 
 ```bash
-make -e NAME=node01.tsand.org ROLE=docker node
+make web-ui-server   # npm install if needed; starts via pm2 on port 3000
 ```
 
-### Deleting a Node
+See [web-ui/README.md](web-ui/README.md). Run on the **same host** as libvirt/Makefile.
 
-This will destroy the VM, remove its storage, and clean up Ansible entries:
+## Build pipeline (summary)
 
-```bash
-make -e NAME=node01.tsand.org Delete
-```
+1. **sources** — `wget` cloud image into `$(SRCDIR)/$(DISTRO)/`.
+2. **base** — copy to shared `$(BASEDIR)/$(DISTRO)/rootfs.qcow2`.
+3. **image** — per-VM root qcow2 overlay + optional `qemu-img resize`.
+4. **role** — splice fragments into `user-data` (`#PACKAGES`, `#BOOTCMD`, `#MOUNTS`, `#RUNCMD`, `#APT`, `#SSHKEYS`).
+5. **disks** — optional swap, data, db, dblog, docroot images.
+6. **network-config** / **meta-data** — cloud-init networking and instance metadata.
+7. **node** — `virt-install`, Ansible registration, `virsh start`, `fresh` snapshot.
 
-### Listing Images
+Full detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-```bash
-make list
-```
+## Distros (`distro` file)
 
-### Creating a Snapshot
+| Name | Ubuntu | Notes |
+|------|--------|--------|
+| `noble`, `noblemin`, `noblearm` | 24.04 | Default build: `noble` amd64 |
+| `jammy`, `jammymin` | 22.04 | |
+| `focal`, `focalmin` | 20.04 | |
+| `bionic`, `bionicmin` | 18.04 | |
+| `resolute` | 26.04 | Pre-release cloud image |
+| `xenial`, `cosmic` | Legacy | |
 
-```bash
-make -e NAME=node01.tsand.org snapshot
-```
+The `noblemin` row in `distro` omits the fourth `;filename` field; use the explicit filename from the URL if you rely on that row.
 
-### Backup
+## Security
 
-```bash
-make -e NAME=node01.tsand.org backup
-```
-
-## How it Works
-
-1. **Sources**: Downloads the official Ubuntu cloud image if not present.
-2. **Base**: Prepares a base qcow2 image from the source.
-3. **Image**: Creates a node-specific root disk using the base image as a backing file and resizes it.
-4. **Role**: Assembles a `user-data` file by inlining fragments from various directories based on the `ROLE` and `DISTRO`.
-5. **Disks**: Creates additional disks (swap, data, etc.) as configured.
-6. **Network**: Generates `network-config` and `meta-data` files.
-7. **Node**: Runs `virt-install` with all prepared disks and cloud-init configurations.
-8. **Finalize**: Registers the node with Ansible and starts the VM.
+Templates and generated `user-data` may contain **password hashes, proxy URLs, and SSH keys**. Treat the repo and build host as sensitive. `.auth.json` (GUI) and `pubkeys/` are local-only artifacts.
