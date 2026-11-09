@@ -10,6 +10,22 @@ ftp_proxy: http://10.0.0.193:3142
 https_proxy: http://10.0.0.193:3142
 
 write_files:
+  - path: /etc/hosts
+    append: true
+    content: |
+      10.0.0.110 ansible.tsand.org ansible
+      10.0.0.111 tom1.tsand.org tom1
+      10.0.0.112 tom2.tsand.org tom2
+      10.0.0.113 tom3.tsand.org tom3
+      10.0.0.114 tom4.tsand.org tom4
+      10.0.0.115 tom5.tsand.org tom5
+      10.0.0.44  beast5.tsand.org beast5
+
+  - path: /etc/ssh/ssh_config.d/StrictHostKeyChecking.conf
+    content: |
+      Host *
+        StrictHostKeyChecking accept-new
+
   - path: /etc/environment
     content: |
       HTTP_PROXY="http://10.0.0.193:3142"

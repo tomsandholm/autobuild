@@ -1,0 +1,15 @@
+#!/bin/bash
+
+INVENTORY_FILE="/etc/dsh/group/virt"
+NEW_HOST="${1?Must declare host}"
+
+# Check if host already exists in the file to prevent duplicates
+if grep -qxF "$NEW_HOST" "$INVENTORY_FILE"; then
+    echo "Host $NEW_HOST already exists in inventory."
+    exit 0
+fi
+
+# append NEW_HOST to existing group file
+echo "$NEW_HOST" >> $INVENTORY_FILE
+echo "Added $NEW_HOST to $INVENTORY_FILE."
+
