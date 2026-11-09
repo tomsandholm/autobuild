@@ -440,7 +440,7 @@ node:	role disks network-config
 		--cloud-init meta-data=$(IMGDIR)/$(SNAME)/meta-data,user-data=$(IMGDIR)/$(SNAME)/user-data,network-config=$(IMGDIR)/$(SNAME)/network-config
 ifeq ($(ANSIBLE),true) 
 	echo "##### registering with Ansible server"
-	./update-ansible $(NAME)
+	sudo ./update-ansible $(NAME)
 	#echo "$(NAME) ansible_python_interpreter=\"/usr/bin/python3\"" | sudo tee -a /etc/ansible/hosts
 	scp /etc/ansible/hosts ansible@ansible:/etc/ansible/hosts
 	ssh ansible@ansible /home/ansible/bin/sshreset $(SNAME)
