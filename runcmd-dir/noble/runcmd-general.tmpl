@@ -11,5 +11,6 @@ runcmd:
   - usermod -aG '{{ ds.meta_data.grpname }}' ansible
   - echo "AllowGroups {{ ds.meta_data.grpname }} sudo" >> /etc/ssh/sshd_config
   - touch /etc/cloud/cloud-init.disabled
+  - su - sandholm -c 'touch ~/.Xauthority && xauth add $DISPLAY . $(mcookie)'
   - eject
   - shutdown -h now
